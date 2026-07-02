@@ -3,9 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-    public DbSet<ScoreEntry> Scores { get; set; }
+    public required DbSet<ClubActivity> ClubActivities { get; set; }
 }
