@@ -9,3 +9,4 @@ frontend/dist/
 # Environment
 .env
 .env.local
+.DS_Store
