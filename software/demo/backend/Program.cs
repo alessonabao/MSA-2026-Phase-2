@@ -1,3 +1,5 @@
+using backend.Activities.Queries;
+using backend.Core;
 using backend.data;
 using backend.Data;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +15,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+// register MediatR handler
+builder.Services.AddMediatR(medi => medi.RegisterServicesFromAssemblyContaining<GetActivityList.Handler>()); 
+
+// register AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
 builder.Services.AddCors(options =>
 {
