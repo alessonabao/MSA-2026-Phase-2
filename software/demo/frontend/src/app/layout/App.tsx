@@ -1,10 +1,11 @@
 import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import "./App.css";
-import Resources from "./pages/Resources";
-import Events from "./pages/Events";
-import Profile from "./pages/Profile";
-import { ThemeProvider } from "./components/theme-provider";
-import { ModeToggle } from "./components/mode-toggle";
+import Resources from "../../features/resources/Resources";
+import Events from "../../features/events/Events";
+import Profile from "../../features/profile/Profile";
+import { ThemeProvider } from "../../components/theme-provider";
+import { ModeToggle } from "../../components/mode-toggle";
+import { Button } from "@/components/ui/button";
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
             <NavLink to="/profile">Profile</NavLink>
             <ModeToggle />
           </nav>
+          <Button>Login</Button>
         </header>
 
         <main>

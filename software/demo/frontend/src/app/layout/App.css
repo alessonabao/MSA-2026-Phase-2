@@ -56,7 +56,7 @@ h2 {
   margin-bottom: 20px;
 }
 
-input {
+/* input {
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -84,7 +84,7 @@ ol {
 ol li {
   padding: 8px 0;
   border-bottom: 1px solid #e0e0e0;
-}
+} */
 
 @theme inline {
   --font-heading: var(--font-sans);
