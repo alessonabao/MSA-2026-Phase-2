@@ -1,6 +1,7 @@
 import type { Activity } from "@/lib/types";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import ActivitiesDashboard from "./dashboard/ActivitiesDashboard";
 
 export default function Activities() {
   const [clubActivities, setClubActivities] = useState<Activity[]>([]);
@@ -15,11 +16,7 @@ export default function Activities() {
     <>
       <div>
         <h1>Events Discovery</h1>
-        <ul>
-          {clubActivities.map((activity) => (
-            <li key={activity.id}>{activity.title}</li>
-          ))}
-        </ul>
+        <ActivitiesDashboard activities={clubActivities} />
       </div>
     </>
   );
