@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Resources from "../../features/resources/Resources";
-import Events from "../../features/events/Events";
+import Activities from "@/features/activities/Activities";
 import Profile from "../../features/profile/Profile";
 import { ThemeProvider } from "../../components/theme-provider";
 import NavBar from "./NavBar";
@@ -14,7 +14,7 @@ export default function App() {
 
         <main>
           <Routes>
-            <Route path="/" element={<Events />} />
+            <Route path="/" element={<Activities />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/profile" element={<Profile />} />
           </Routes>

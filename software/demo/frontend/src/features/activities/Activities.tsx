@@ -2,7 +2,7 @@ import type { Activity } from "@/lib/types";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-export default function Events() {
+export default function Activities() {
   const [clubActivities, setClubActivities] = useState<Activity[]>([]);
 
   useEffect(() => {
