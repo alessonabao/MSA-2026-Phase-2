@@ -1,6 +1,7 @@
 import type { Activity } from "@/lib/types";
 import ActivityList from "./ActivityList";
 import ActivityDetail from "../details/ActivityDetail";
+import { ActivityForm } from "../form/ActivityForm";
 
 type Props = {
   activities: Activity[];
@@ -27,13 +28,14 @@ export default function ActivitiesDashboard({
         </div>
 
         {/* Events Actions */}
-        <div className="bg-green-500">
+        <div>
           {selectedActivity && (
             <ActivityDetail
               activity={selectedActivity}
               cancelSelectActivity={cancelSelectActivity}
             />
           )}
+          <ActivityForm />
         </div>
       </div>
     </>
