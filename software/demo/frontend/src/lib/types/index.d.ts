@@ -1,4 +1,4 @@
-export type Weapon = "Foil" | "Épée" | "Sabre";
+export type Weapon = "Foil" | "Épée" | "Sabre" | "Mixed";
 export type SkillLevel = "Beginner" | "Intermediate" | "Advanced";
 export type ActivityType = "Competition" | "Training" | "Social";
 

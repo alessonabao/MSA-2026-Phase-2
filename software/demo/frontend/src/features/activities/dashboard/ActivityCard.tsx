@@ -15,18 +15,13 @@ import { CalendarDays, Wallet, MapPin, Clock7 } from "lucide-react";
 
 type Props = {
   activity: Activity;
+  selectActivity: (id: string) => void;
 };
 
-export default function ActivityCard({ activity }: Props) {
+export default function ActivityCard({ activity, selectActivity }: Props) {
   return (
     <>
-      <Card className="relative mx-auto w-full max-w pt-0 mb-10">
-        <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
-        <img
-          src="/sabre.jpg"
-          alt="Event cover"
-          className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
-        />
+      <Card className="relative mx-auto w-full max-w mb-10 pt-5">
         <CardHeader>
           <CardAction>
             <Badge variant="secondary">{activity.weapon}</Badge>
@@ -34,7 +29,9 @@ export default function ActivityCard({ activity }: Props) {
             <Badge variant="secondary">{activity.type}</Badge>
           </CardAction>
           <CardTitle>{activity.title}</CardTitle>
-          <CardDescription>{activity.description}</CardDescription>
+          <CardDescription className="line-clamp-2">
+            {activity.description}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -66,7 +63,12 @@ export default function ActivityCard({ activity }: Props) {
           </div>
         </CardContent>
         <CardFooter>
-          <Button className="w-full">View Event</Button>
+          <Button
+            className="w-full"
+            onClick={() => selectActivity(activity.id)}
+          >
+            View Event
+          </Button>
         </CardFooter>
       </Card>
     </>

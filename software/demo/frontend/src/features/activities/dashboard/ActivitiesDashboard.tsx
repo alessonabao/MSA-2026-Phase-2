@@ -1,21 +1,40 @@
 import type { Activity } from "@/lib/types";
 import ActivityList from "./ActivityList";
+import ActivityDetail from "../details/ActivityDetail";
 
 type Props = {
   activities: Activity[];
+  selectActivity: (id: string) => void;
+  cancelSelectActivity: () => void;
+  selectedActivity?: Activity;
 };
 
-export default function ActivitiesDashboard({ activities }: Props) {
+export default function ActivitiesDashboard({
+  activities,
+  selectActivity,
+  cancelSelectActivity,
+  selectedActivity,
+}: Props) {
   return (
     <>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[7fr_3fr]">
         {/* Events Cards*/}
-        <div className="bg-amber-500">
-          <ActivityList activities={activities} />
+        <div>
+          <ActivityList
+            activities={activities}
+            selectActivity={selectActivity}
+          />
         </div>
 
         {/* Events Actions */}
-        <div className="bg-green-500"></div>
+        <div className="bg-green-500">
+          {selectedActivity && (
+            <ActivityDetail
+              activity={selectedActivity}
+              cancelSelectActivity={cancelSelectActivity}
+            />
+          )}
+        </div>
       </div>
     </>
   );

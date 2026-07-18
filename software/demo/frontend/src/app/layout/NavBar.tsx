@@ -17,7 +17,11 @@ export default function NavBar() {
         {/* Left — branding */}
         <div className="flex items-center gap-3">
           <img
-            src={theme === "dark" ? "/dark-icon-md.png" : "/light-icon-md.png"}
+            src={
+              theme === "dark"
+                ? "/images/dark-icon-md.png"
+                : "/images/light-icon-md.png"
+            }
             alt="En Garde Logo"
             className="h-9 w-9"
           />
