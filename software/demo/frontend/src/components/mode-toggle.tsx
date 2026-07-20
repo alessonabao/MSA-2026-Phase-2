@@ -8,6 +8,7 @@ export function ModeToggle() {
 
   return (
     <Button
+      id="nav-light-dark-mode-btn"
       variant="outline"
       size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}

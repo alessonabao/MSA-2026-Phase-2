@@ -7,14 +7,12 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -52,7 +50,13 @@ const formSchema = z
       .string()
       .min(3, "Title must be at least 3 characters.")
       .max(100, "Title must be at most 100 characters."),
-    date: z.string().min(1, "Date is required."),
+    date: z.coerce
+      .date()
+      .min(new Date(), { message: "Date cannot be in the past" })
+      .max(new Date("2030-01-01"), {
+        message: "Date is too far in the future",
+      })
+      .transform((val) => new Date(val)),
     startTime: z.string().min(1, "Start time is required."),
     endTime: z.string().min(1, "End time is required."),
     description: z
@@ -130,15 +134,24 @@ export function ActivityForm() {
   const [dateMonth, setDateMonth] = useState<Date | undefined>(date);
   const [dateValue, setDateValue] = useState(formatDate(date));
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<z.output<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
+      date: new Date(),
+      startTime: "18:30",
+      endTime: "21:00",
       description: "",
+      weapon: "Mixed",
+      skillLevel: "Beginner",
+      type: "Training",
+      city: "",
+      venue: "",
+      price: 0,
     },
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  function onSubmit(data: z.output<typeof formSchema>) {
     console.log("Submitted form: ", data);
   }
 
@@ -156,12 +169,12 @@ export function ActivityForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-demo-title">
+                  <FieldLabel htmlFor="form-title">
                     Club Activity Title
                   </FieldLabel>
                   <Input
                     {...field}
-                    id="form-rhf-demo-title"
+                    id="form-title"
                     aria-invalid={fieldState.invalid}
                     placeholder="Club activity title"
                     autoComplete="off"
@@ -178,13 +191,13 @@ export function ActivityForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-demo-description">
+                  <FieldLabel htmlFor="form-description">
                     Description
                   </FieldLabel>
                   <InputGroup>
                     <InputGroupTextarea
                       {...field}
-                      id="form-rhf-demo-description"
+                      id="form-description"
                       placeholder="Information club members need to know."
                       rows={6}
                       className="min-h-24 resize-none"
@@ -208,18 +221,19 @@ export function ActivityForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-demo-title">Date</FieldLabel>
+                  <FieldLabel htmlFor="form-date">Date</FieldLabel>
                   <InputGroup>
                     <InputGroupInput
-                      id="date-required"
+                      id="form-date"
                       value={dateValue}
                       placeholder="Select date"
                       onChange={(e) => {
-                        const date = new Date(e.target.value);
+                        const parsedDate = new Date(e.target.value);
                         setDateValue(e.target.value);
-                        if (isValidDate(date)) {
-                          setDate(date);
-                          setDateMonth(date);
+                        if (isValidDate(parsedDate)) {
+                          setDate(parsedDate);
+                          setDateMonth(parsedDate);
+                          field.onChange(parsedDate);
                         }
                       }}
                       onKeyDown={(e) => {
@@ -233,7 +247,7 @@ export function ActivityForm() {
                       <Popover open={dateOpen} onOpenChange={setDateOpen}>
                         <PopoverTrigger>
                           <InputGroupButton
-                            id="date-picker"
+                            id="date-picker-btn"
                             variant="ghost"
                             size="icon-xs"
                             aria-label="Select date"
@@ -253,9 +267,10 @@ export function ActivityForm() {
                             selected={date}
                             month={dateMonth}
                             onMonthChange={setDateMonth}
-                            onSelect={(date) => {
-                              setDate(date);
-                              setDateValue(formatDate(date));
+                            onSelect={(selectedDate) => {
+                              setDate(selectedDate);
+                              setDateValue(formatDate(selectedDate));
+                              field.onChange(selectedDate);
                               setDateOpen(false);
                             }}
                           />
@@ -275,17 +290,15 @@ export function ActivityForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-demo-title">
-                    Start Time
-                  </FieldLabel>
+                  <FieldLabel htmlFor="form-startTime">Start Time</FieldLabel>
                   <Input
-                    {...field}
-                    id="form-rhf-demo-startTime"
+                    value={field.value}
+                    onChange={field.onChange}
+                    id="form-startTime"
                     type="time"
                     aria-invalid={fieldState.invalid}
                     placeholder="Start time"
                     autoComplete="off"
-                    defaultValue="18:30"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -299,12 +312,11 @@ export function ActivityForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-demo-title">
-                    End Time
-                  </FieldLabel>
+                  <FieldLabel htmlFor="form-endTime">End Time</FieldLabel>
                   <Input
-                    {...field}
-                    id="form-rhf-demo-endTime"
+                    value={field.value}
+                    onChange={field.onChange}
+                    id="form-endTime"
                     type="time"
                     aria-invalid={fieldState.invalid}
                     placeholder="End time"
@@ -323,9 +335,9 @@ export function ActivityForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="activity-weapon">Weapon</FieldLabel>
-                  <Select onValueChange={(val) => console.log(val)}>
-                    <SelectTrigger className="w-full">
+                  <FieldLabel htmlFor="form-weapon">Weapon</FieldLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger id="form-weapon" className="w-full">
                       <SelectValue placeholder="Select a weapon" />
                     </SelectTrigger>
                     <SelectContent>
@@ -347,15 +359,13 @@ export function ActivityForm() {
             />
             {/* Skill Level */}
             <Controller
-              name="weapon"
+              name="skillLevel"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="activity-skillLevel">
-                    Skill Level
-                  </FieldLabel>
-                  <Select onValueChange={(val) => console.log(val)}>
-                    <SelectTrigger className="w-full">
+                  <FieldLabel htmlFor="form-skillLevel">Skill Level</FieldLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger id="form-skillLevel" className="w-full">
                       <SelectValue placeholder="Select skill level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -380,15 +390,15 @@ export function ActivityForm() {
             />
             {/* Type: Club activity type */}
             <Controller
-              name="weapon"
+              name="type"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="activity-type">
+                  <FieldLabel htmlFor="form-type">
                     Club Activity Type
                   </FieldLabel>
-                  <Select onValueChange={(val) => console.log(val)}>
-                    <SelectTrigger className="w-full">
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger id="form-type" className="w-full">
                       <SelectValue placeholder="Select club activity type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -417,10 +427,10 @@ export function ActivityForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-demo-title">City</FieldLabel>
+                  <FieldLabel htmlFor="form-city">City</FieldLabel>
                   <Input
                     {...field}
-                    id="form-rhf-demo-city"
+                    id="form-city"
                     aria-invalid={fieldState.invalid}
                     placeholder="City"
                     autoComplete="off"
@@ -437,10 +447,10 @@ export function ActivityForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-demo-title">Venue</FieldLabel>
+                  <FieldLabel htmlFor="form-venue">Venue</FieldLabel>
                   <Input
                     {...field}
-                    id="form-rhf-demo-venue"
+                    id="form-venue"
                     aria-invalid={fieldState.invalid}
                     placeholder="Venue"
                     autoComplete="off"
@@ -457,10 +467,10 @@ export function ActivityForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-demo-title">Price</FieldLabel>
+                  <FieldLabel htmlFor="form-price">Price</FieldLabel>
                   <Input
                     {...field}
-                    id="form-rhf-demo-price"
+                    id="form-price"
                     aria-invalid={fieldState.invalid}
                     placeholder="0"
                     autoComplete="off"
@@ -476,10 +486,15 @@ export function ActivityForm() {
       </CardContent>
       <CardFooter>
         <Field orientation="horizontal">
-          <Button type="button" variant="outline" onClick={() => form.reset()}>
+          <Button
+            id="form-reset"
+            type="button"
+            variant="outline"
+            onClick={() => form.reset()}
+          >
             Reset
           </Button>
-          <Button type="submit" form="form-rhf-demo">
+          <Button id="form-submit" type="submit" form="form-submit-btn">
             Submit
           </Button>
         </Field>

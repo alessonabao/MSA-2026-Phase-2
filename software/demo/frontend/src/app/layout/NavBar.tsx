@@ -32,6 +32,7 @@ export default function NavBar() {
         <nav className="hidden items-center gap-8 md:flex">
           <NavLink
             to="/"
+            id="nav-events"
             end
             className={({ isActive }) =>
               isActive
@@ -44,6 +45,7 @@ export default function NavBar() {
 
           <NavLink
             to="/resources"
+            id="nav-resources"
             className={({ isActive }) =>
               isActive
                 ? "border-b-2 border-primary pb-0.5 text-md font-semibold text-foreground"
@@ -55,6 +57,7 @@ export default function NavBar() {
 
           <NavLink
             to="/profile"
+            id="nav-profile"
             className={({ isActive }) =>
               isActive
                 ? "border-b-2 border-primary pb-0.5 text-md font-semibold text-foreground"
@@ -70,14 +73,23 @@ export default function NavBar() {
           <ModeToggle />
 
           {/* Desktop button */}
-          <Button size="lg" className="hidden md:flex">
+          <Button
+            id="nav-create-event-btn"
+            size="lg"
+            className="hidden md:flex"
+          >
             Create an Event
           </Button>
 
           {/* Mobile navigation */}
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="md:hidden">
+              <Button
+                id="mobile-nav-menu"
+                variant="outline"
+                size="icon"
+                className="md:hidden"
+              >
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
@@ -87,6 +99,7 @@ export default function NavBar() {
               <div className="mt-8 flex flex-col gap-6">
                 <NavLink
                   to="/"
+                  id="mobile-nav-events"
                   end
                   className={({ isActive }) =>
                     isActive
@@ -99,6 +112,7 @@ export default function NavBar() {
 
                 <NavLink
                   to="/resources"
+                  id="mobile-nav-resources"
                   className={({ isActive }) =>
                     isActive
                       ? "font-semibold text-foreground"
@@ -110,6 +124,7 @@ export default function NavBar() {
 
                 <NavLink
                   to="/profile"
+                  id="mobile-nav-profile"
                   className={({ isActive }) =>
                     isActive
                       ? "font-semibold text-foreground"
@@ -119,7 +134,12 @@ export default function NavBar() {
                   Profile
                 </NavLink>
 
-                <Button className="mt-4 w-full">Create an Event</Button>
+                <Button
+                  id="mobile-nav-create-event-btn"
+                  className="mt-4 w-full"
+                >
+                  Create an Event
+                </Button>
               </div>
             </SheetContent>
           </Sheet>
