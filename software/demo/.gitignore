@@ -12,8 +12,12 @@ frontend/dist/
 .DS_Store
 .vscode
 
-# database
-software/demo/backend/appsettings.json
-software/demo/backend/fencingclub.db
-software/demo/backend/fencingclub.db-shm
-software/demo/backend/fencingclub.db-wal
+# Database
+backend/appsettings.json
+backend/fencingclub.db
+backend/fencingclub.db-shm
+backend/fencingclub.db-wal
+
+# Playwright
+test-results/
+playwright-report/
