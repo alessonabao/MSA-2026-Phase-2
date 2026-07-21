@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, type Resolver } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -134,8 +134,12 @@ export function ActivityForm() {
   const [dateMonth, setDateMonth] = useState<Date | undefined>(date);
   const [dateValue, setDateValue] = useState(formatDate(date));
 
-  const form = useForm<z.output<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<
+    z.output<typeof formSchema>,
+    unknown,
+    z.output<typeof formSchema>
+  >({
+    resolver: zodResolver(formSchema) as Resolver<z.output<typeof formSchema>>,
     defaultValues: {
       title: "",
       date: new Date(),
@@ -161,7 +165,7 @@ export function ActivityForm() {
         <CardTitle>Create a club activity</CardTitle>
       </CardHeader>
       <CardContent>
-        <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
+        <form id="form-activity" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             {/* Title */}
             <Controller
@@ -245,7 +249,7 @@ export function ActivityForm() {
                     />
                     <InputGroupAddon align="inline-end">
                       <Popover open={dateOpen} onOpenChange={setDateOpen}>
-                        <PopoverTrigger>
+                        <PopoverTrigger asChild>
                           <InputGroupButton
                             id="date-picker-btn"
                             variant="ghost"
@@ -321,7 +325,6 @@ export function ActivityForm() {
                     aria-invalid={fieldState.invalid}
                     placeholder="End time"
                     autoComplete="off"
-                    defaultValue="21:00"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -494,7 +497,7 @@ export function ActivityForm() {
           >
             Reset
           </Button>
-          <Button id="form-submit" type="submit" form="form-submit-btn">
+          <Button id="form-submit" type="submit" form="form-activity">
             Submit
           </Button>
         </Field>
