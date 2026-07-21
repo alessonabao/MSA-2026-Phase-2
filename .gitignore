@@ -16,10 +16,10 @@ frontend/dist/
 .vscode
 
 # Database
-backend/appsettings.json
-backend/fencingclub.db
-backend/fencingclub.db-shm
-backend/fencingclub.db-wal
+software/demo/backend/appsettings.json
+software/demo/backend/fencingclub.db
+software/demo/backend/fencingclub.db-shm
+software/demo/backend/fencingclub.db-wal
 
 # Playwright
 test-results/
