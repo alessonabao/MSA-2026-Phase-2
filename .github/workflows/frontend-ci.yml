@@ -1,0 +1,49 @@
+# ============================================================
+# Frontend CI Pipeline
+# Triggers on pushes and pull requests to main/develop that
+# touch frontend files or this workflow file.
+# Delegates all steps to reusable-ci.yml.
+# ============================================================
+
+name: Frontend CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - "software/demo/frontend/**"
+      - ".github/workflows/frontend-ci.yml"
+      - ".github/workflows/reusable-ci.yml"
+
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - "software/demo/frontend/**"
+      - ".github/workflows/frontend-ci.yml"
+      - ".github/workflows/reusable-ci.yml"
+
+jobs:
+  frontend:
+    uses: ./.github/workflows/reusable-ci.yml
+    with:
+      # Tells the reusable workflow to run frontend steps
+      project-type: frontend
+
+      # Frontend project folder
+      working-directory: software/demo/frontend
+
+      # Node version matching devDependencies
+      node-version: "24"
+
+      # Run ESLint across all source files
+      lint-command: npm run lint
+
+      # TypeScript check + Vite bundle
+      build-command: npm run build
+
+      # Run Playwright e2e tests
+      test-command: npm run test:e2e
