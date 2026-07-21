@@ -1,0 +1,176 @@
+# ============================================================
+# Reusable CI Workflow
+# Called by frontend-ci.yml and backend-ci.yml.
+# Supports both frontend (Node/npm) and backend (.NET) projects
+# via the project-type input.
+# ============================================================
+
+name: Reusable CI Workflow
+
+on:
+  workflow_call:
+    inputs:
+      # --------------------------------------------------------
+      # Determines which setup steps run (frontend or backend).
+      # --------------------------------------------------------
+      project-type:
+        description: "Type of project: frontend or backend"
+        required: true
+        type: string
+
+      # --------------------------------------------------------
+      # The folder where the project lives.
+      # --------------------------------------------------------
+      working-directory:
+        description: "Directory where the project is located"
+        required: true
+        type: string
+
+      # --------------------------------------------------------
+      # Node.js version — frontend only.
+      # --------------------------------------------------------
+      node-version:
+        description: "Node.js version (frontend only)"
+        required: false
+        default: "24"
+        type: string
+
+      # --------------------------------------------------------
+      # .NET SDK version — backend only.
+      # Defaults to 10.0.x to match net10.0 in backend.csproj.
+      # --------------------------------------------------------
+      dotnet-version:
+        description: ".NET SDK version (backend only)"
+        required: false
+        default: "10.0.x"
+        type: string
+
+      # --------------------------------------------------------
+      # Lint command — frontend only.
+      # Skipped entirely for backend projects.
+      # --------------------------------------------------------
+      lint-command:
+        description: "Command used to lint the project (frontend only)"
+        required: false
+        default: ""
+        type: string
+
+      # --------------------------------------------------------
+      # The command used to compile the project.
+      # --------------------------------------------------------
+      build-command:
+        description: "Command used to build the project"
+        required: true
+        type: string
+
+      # --------------------------------------------------------
+      # The command used to run tests.
+      # --------------------------------------------------------
+      test-command:
+        description: "Command used to run tests"
+        required: true
+        type: string
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+
+    steps:
+      # --------------------------------------------------------
+      # Pull down the repo code
+      # --------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # --------------------------------------------------------
+      # Setup Node.js — frontend only
+      # --------------------------------------------------------
+      - name: Setup Node.js
+        if: inputs.project-type == 'frontend'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+          cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+
+      # --------------------------------------------------------
+      # Setup .NET SDK — backend only
+      # --------------------------------------------------------
+      - name: Setup .NET
+        if: inputs.project-type == 'backend'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
+
+      # --------------------------------------------------------
+      # Cache NuGet packages — backend only.
+      # Skips re-downloading unchanged packages on repeat runs.
+      # --------------------------------------------------------
+      - name: Cache NuGet packages
+        if: inputs.project-type == 'backend'
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles(format('{0}/*.csproj', inputs.working-directory)) }}
+          restore-keys: nuget-
+
+      # --------------------------------------------------------
+      # Install npm dependencies — frontend only.
+      # npm ci uses package-lock.json for reproducible installs.
+      # --------------------------------------------------------
+      - name: Install dependencies
+        if: inputs.project-type == 'frontend'
+        run: npm ci
+
+      # --------------------------------------------------------
+      # Restore NuGet packages — backend only.
+      # --------------------------------------------------------
+      - name: Restore dependencies
+        if: inputs.project-type == 'backend'
+        run: dotnet restore
+
+      # --------------------------------------------------------
+      # Run linter — frontend only, and only if lint-command
+      # is provided. Skipped automatically for backend.
+      # --------------------------------------------------------
+      - name: Lint
+        if: inputs.project-type == 'frontend' && inputs.lint-command != ''
+        run: ${{ inputs.lint-command }}
+
+      # --------------------------------------------------------
+      # Build the project using the command from the caller.
+      # --------------------------------------------------------
+      - name: Build
+        run: ${{ inputs.build-command }}
+
+      # --------------------------------------------------------
+      # Install Playwright browsers — frontend only.
+      # Only installs Chromium to keep the step fast.
+      # --------------------------------------------------------
+      - name: Install Playwright browsers
+        if: inputs.project-type == 'frontend'
+        run: npx playwright install --with-deps chromium
+
+      # --------------------------------------------------------
+      # Run tests using the command from the caller.
+      # --------------------------------------------------------
+      - name: Run tests
+        run: ${{ inputs.test-command }}
+
+      # --------------------------------------------------------
+      # Upload Playwright HTML report — frontend only.
+      # always() ensures this runs even when tests fail so you
+      # can download the report and inspect what went wrong.
+      # --------------------------------------------------------
+      - name: Upload Playwright report
+        if: inputs.project-type == 'frontend' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: ${{ inputs.working-directory }}/playwright-report/
+          retention-days: 7
