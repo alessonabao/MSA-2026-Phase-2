@@ -2,8 +2,8 @@
 .DS_Store
 
 # .NET
-backend/bin/
-backend/obj/
+software/demo/backend/bin/
+software/demo/backend/obj/
 
 # Node
 frontend/node_modules/
