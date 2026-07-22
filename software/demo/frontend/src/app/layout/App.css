@@ -12,6 +12,9 @@ body {
 }
 
 /* Header styles moved to NavBar.tsx via Tailwind classes */
+p {
+  text-align: justify;
+}
 
 main {
   max-width: 1600px;
@@ -140,5 +143,37 @@ main {
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer components {
+  /* Headings */
+  .page-title {
+    @apply text-4xl font-semibold tracking-wide pb-6;
+  }
+
+  .section-title {
+    @apply text-2xl font-semibold tracking-wide pt-8 pb-4;
+  }
+
+  .subsection-title {
+    @apply text-xl font-semibold tracking-wide pt-4 pb-4;
+  }
+
+  /* Video */
+  .video-section {
+    @apply my-8;
+  }
+
+  .video-container {
+    @apply mx-auto w-full max-w-2xl overflow-hidden rounded-xl shadow-md;
+  }
+
+  .video-wrapper {
+    @apply aspect-video;
+  }
+
+  .video-frame {
+    @apply h-full w-full;
   }
 }
