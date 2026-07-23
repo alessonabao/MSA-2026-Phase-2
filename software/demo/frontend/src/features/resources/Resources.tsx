@@ -1,101 +1,81 @@
+import { Card, CardContent } from "@/components/ui/card";
+import VideoCarousel from "./VideoCarousel";
+import {
+  Dumbbell,
+  PersonStanding,
+  Footprints,
+  Sword,
+  Swords,
+} from "lucide-react";
+
+const weaponInfo = [
+  {
+    title: "Foil",
+    duration: "2:24",
+    description:
+      "Foil is often introduced as a beginner weapon because it teaches the foundations of fencing technique. Points are scored using the tip of the blade with the torso as a target area. Foil also uses the concept of right of way, meaning fencers must understand the order of attacks and defensive actions",
+    videoSrc: "https://www.youtube.com/embed/g-P_q5gdvRM",
+  },
+  {
+    title: "Épée",
+    duration: "2:16",
+    description:
+      "Épée is the closest weapon to traditional duelling. The entire body is a valid target and there are no right-of-way rules. This makes timing, patience, and strategy especially important.",
+    videoSrc: "https://www.youtube.com/embed/88mBQ2u2Wb0",
+  },
+  {
+    title: "Sabre",
+    duration: "2:52",
+    description:
+      "Sabre is the fastest fencing discipline. Fencers can score using both the tip and edge of the blade, with the valid target area including everything above the waist except the hands. Sabre focuses heavily on speed, reactions, and aggressive attacks.",
+    videoSrc: "https://www.youtube.com/embed/g-P_q5gdvRM",
+  },
+];
+
+const trainingItems = [
+  {
+    icon: <Dumbbell className="w-10 h-10" />,
+    label: "Warm-up exercises",
+  },
+  {
+    icon: <PersonStanding className="w-10 h-10" />,
+    label: "Learning the en garde position",
+  },
+  {
+    icon: <Footprints className="w-10 h-10" />,
+    label: "Practising footwork",
+  },
+  {
+    icon: <Sword className="w-10 h-10" />,
+    label: "Basic weapon movements",
+  },
+  { icon: <Swords className="w-10 h-10" />, label: "Partner drills" },
+];
+
 export default function Resources() {
   return (
     <>
-      <div>
-        <h1 className="page-title">Beginner Fencer's Guide</h1>
-        {/* Introduction */}
-        <h2 className="section-title">Welcome to the art of Fencing</h2>
-        <p>
-          Fencing is a sport that combines physical ability, strategy, and
-          discipline. While it may look intimidating at first, every experienced
-          fencer started by learning the same fundamentals: how to stand, move,
-          hold a weapon, and understand the flow of a bout. Fencing is not only
-          about speed or strength. It is a sport of decision-making, where
-          fencers must read their opponent, control distance, and choose the
-          right moment to attack or defend. Whether you want to compete, stay
-          active, or simply try something new, fencing provides a unique
-          challenge that rewards patience and continuous improvement. Your first
-          few sessions are about learning the basics and becoming comfortable
-          with the sport. Do not worry about being perfect immediately. Focus on
-          building good habits, listening to your coach, and enjoying the
-          learning process.
-        </p>
-      </div>
-      {/* Weapons info */}
-      <div>
-        <h2 className="section-title">
-          Understanding the Three Fencing Weapons
-        </h2>
-        <p>
-          Fencing has three different disciplines: Foil, Épée, and Sabre. Each
-          weapon has its own rules, target areas, and style of fencing.
-        </p>
-        {/* Foil */}
-        <h3 className="subsection-titl">Foil</h3>
-        <p>
-          Foil is often introduced as a beginner weapon because it teaches the
-          foundations of fencing technique. Points are scored using the tip of
-          the blade, and the valid target area is the torso. Foil also uses the
-          concept of right of way, meaning fencers must understand the order of
-          attacks and defensive actions.
-        </p>
-        <div className="video-section">
-          <div className="video-container">
-            <div className="video-wrapper">
-              <iframe
-                className="h-full w-full"
-                src="https://www.youtube.com/embed/g-P_q5gdvRM"
-                title="Sports Explainer: The classic fencing weapon, the foil"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              />
-            </div>
-          </div>
-        </div>
-        {/* Epee */}
-        <h3 className="subsection-title">Épée</h3>
-        <p>
-          Épée is the closest weapon to traditional duelling. The entire body is
-          a valid target, and there are no right-of-way rules. This makes
-          timing, patience, and strategy especially important.
-        </p>
-        <div className="video-section">
-          <div className="video-container">
-            <div className="video-wrapper">
-              <iframe
-                className="h-full w-full"
-                src="https://www.youtube.com/embed/88mBQ2u2Wb0"
-                title="Sports Explainer: The precise art of the epee"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              />
-            </div>
-          </div>
-        </div>
-        {/* Sabre */}
-        <h3 className="subsection-title">Sabre</h3>
-        <p>
-          Sabre is the fastest fencing discipline. Fencers can score using both
-          the tip and edge of the blade, with the valid target area including
-          everything above the waist except the hands. Sabre focuses heavily on
-          speed, reactions, and aggressive attacks.
-        </p>
-        <div className="video-section">
-          <div className="video-container">
-            <div className="video-wrapper">
-              <iframe
-                className="h-full w-full"
-                src="https://www.youtube.com/embed/4ipiJFlU_Dg"
-                title="Sports Explainer: The sabre"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              />
-            </div>
-          </div>
-        </div>
+      {/* Introduction */}
+      <div id="introduction-section">
+        <Card className="relative overflow-hidden w-full h-100 border-none rounded-xl">
+          {/* The background image */}
+          <img
+            src="images/placeholder.jpg"
+            alt="Scenic landscape"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          {/* Dark overlay to ensure text readability */}
+          <div className="absolute inset-0 bg-black/40" />
+          {/* Text Content Container */}
+          <CardContent className="relative z-10 h-full flex flex-col justify-end p-6 text-white">
+            <h3 className="page-title">Welcome to the art of Fencing</h3>
+            <p className="text-lg text-gray-200 mt-1">
+              Fencing is a sport that combines physical agility, strategy, and
+              discipline. From your first lunge to club competition, En Garde is
+              your technical parter in excellence.
+            </p>
+          </CardContent>
+        </Card>
       </div>
       {/* Fencing Position */}
       <div>
@@ -110,135 +90,135 @@ export default function Resources() {
           opponent. The goal is not to stand still, but to create a position
           where you are always prepared to attack, defend, or move away.
         </p>
-        <div className="video-section">
-          <div className="video-container">
-            <div className="video-wrapper">
+        <div className="grid grid-cols-1 gap-6 pt-4">
+          <Card className="overflow-hidden border border-border rounded-xl p-0 gap-0">
+            {/* Video with duration badge*/}
+            <div className="relative aspect-video max-h-90 bg-black">
               <iframe
-                className="h-full w-full"
+                className="w-full h-full"
                 src="https://www.youtube.com/embed/tWZ_Tnsl7lU"
                 title="The En Garde Position"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
+              {/* Duration badge */}
+              <span className="absolute bottom-3 left-3 bg-[#1a2a4a]/90 text-white text-xs font-mono font-semibold px-2 py-0.5 rounded">
+                3:17
+              </span>
             </div>
-          </div>
+            {/* Text content */}
+            <CardContent className="p-5 space-y-2 grid grid-cols-3 gap-6">
+              <div>
+                <h3 className="text-lg font-bold tracking-tight">Advance</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  An advance is a forward movement used to close distance with
+                  your opponent. The front foot moves first, followed by the
+                  back foot, while maintaining your fencing stance.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold tracking-tight">Retreat</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  A retreat moves backwards to create distance or avoid an
+                  opponent's attack. The back foot moves first, followed by the
+                  front foot.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold tracking-tight">Lunge</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  The lunge is an attacking movement where the fencer extends
+                  their weapon arm and pushes forward to reach the opponent.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
-      {/* Footwork */}
-      <div>
-        <h2 className="section-title">Mastering Basic Footwork</h2>
-        <h3 className="subsection-title">Advance</h3>
-        <p>
-          An advance is a forward movement used to close distance with your
-          opponent. The front foot moves first, followed by the back foot, while
-          maintaining your fencing stance.
-        </p>
-        <h3 className="subsection-title">Retreat</h3>
-        <p>
-          A retreat moves backwards to create distance or avoid an opponent's
-          attack. The back foot moves first, followed by the front foot.
-        </p>
-        <h3 className="subsection-title">Lunge</h3>
-        <p>
-          The lunge is one of the most recognisable fencing actions. It is an
-          attacking movement where the fencer extends their weapon arm and
-          pushes forward to reach the opponent. Developing a strong lunge
-          requires balance, timing, and proper recovery. Beginners should focus
-          on performing movements correctly rather than trying to move quickly.
-          Speed comes naturally as technique improves.
-        </p>
-      </div>
+      {/* Weapons info */}
+      <VideoCarousel
+        heading="Understanding the Three Fencing Weapons"
+        items={weaponInfo}
+      />
       {/* Fencing Equipment */}
       <div>
         <h2 className="section-title">Understanding Fencing Equipment</h2>
-        <p>
-          Fencing uses specialised protective equipment designed to keep
-          athletes safe during training and competitions. Beginners usually
-          start with club-provided equipment, including a mask, jacket, glove,
-          and weapon. Comfortable athletic clothing and indoor sports shoes are
-          usually recommended for first sessions. As you continue fencing, you
-          may choose to purchase your own equipment. A properly fitted glove,
-          comfortable mask, and reliable weapon can make training more enjoyable
-          and consistent. Before every session, fencers should check that their
-          equipment is secure and in good condition.
-        </p>
-        <div className="video-section">
-          <div className="video-container">
-            <div className="video-wrapper">
-              <iframe
-                className="h-full w-full"
-                src="https://www.youtube.com/embed/hewxp0mFlj0"
-                title="Fencing 101. The Uniform, Blades, and how to order equipment."
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              />
-            </div>
+        <Card className="overflow-hidden border border-border rounded-xl p-0 gap-0">
+          {/* Video with duration badge*/}
+          <div className="relative aspect-video max-h-110 bg-black">
+            <iframe
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/hewxp0mFlj0"
+              title="Fencing 101. The Uniform, Blades, and how to order equipment."
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+            {/* Duration badge */}
+            <span className="absolute bottom-3 left-3 bg-[#1a2a4a]/90 text-white text-xs font-mono font-semibold px-2 py-0.5 rounded">
+              10:26
+            </span>
           </div>
-        </div>
+
+          {/* Text content */}
+          <CardContent className="p-5 space-y-2">
+            <div>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Fencing uses specialised protective equipment designed to keep
+                athletes safe during training and competitions. Beginners
+                usually start with club-provided equipment, including a mask,
+                jacket, glove, and weapon. Comfortable athletic clothing and
+                indoor sports shoes are usually recommended for first sessions.
+                As you continue fencing, you may choose to purchase your own
+                equipment. A properly fitted glove, comfortable mask, and
+                reliable weapon can make training more enjoyable and consistent.
+                Before every session, fencers should check that their equipment
+                is secure and in good condition.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
       {/* Training */}
-      <div>
-        <h2 className="section-title">
-          What Happens During Your First Training Session?
+      <div className="ml-15 mr-15 mt-6">
+        <h2 className="section-title text-center">
+          What Happens During Your First Beginner Training Session?
         </h2>
-        <p>
-          Your first fencing session is designed to introduce you to the sport
-          gradually. A typical beginner session may include:
-        </p>
-        <ul role="list" className="list-disc pl-8 pb-4">
-          <li>Warm-up exercises</li>
-          <li>Learning the en garde position</li>
-          <li>Practising footwork</li>
-          <li>Basic weapon movements</li>
-          <li>Partner drills</li>
-          <li>Controlled practice bouts</li>
-        </ul>
-        <p>
-          You may not fence a full competitive match on your first day, and that
-          is completely normal. Coaches focus on helping new fencers build
-          confidence and learn safely before moving into more advanced
-          techniques. Remember that everyone at the club was once a beginner.
-          Asking questions and learning from experienced members is part of
-          becoming a better fencer.
-        </p>
-      </div>
-      {/* First competition */}
-      <div>
-        <h2 className="section-title">Preparing for Your First Competition</h2>
-        <p>
-          Your first competition is an opportunity to experience fencing in a
-          new environment and learn from other athletes. Before competing, make
-          sure you understand:
-        </p>
-        <ul role="list" className="list-disc pl-8 pb-4">
-          <li>Competition rules</li>
-          <li>Equipment requirements</li>
-          <li>Warm-up routines</li>
-          <li>How scoring works</li>
-          <li>Competition etiquette</li>
-        </ul>
-        <p>
-          A competition is not only about winning. It is a chance to test your
-          skills, meet other fencers, and identify areas where you can improve.
-          Every bout, whether you win or lose, helps you become a more
-          experienced fencer.
-        </p>
+        <div className="mt-4 space-y-4 flex flex-col items-center">
+          {trainingItems.map((trainingItem) => (
+            <div
+              key={trainingItem.label}
+              className="flex items-center gap-4 w-72"
+            >
+              {trainingItem.icon}
+              <span className="text-lg font-medium">{trainingItem.label}</span>
+            </div>
+          ))}
+        </div>
       </div>
       {/* Community */}
-      <div>
-        <h2 className="section-title">
-          Becoming Part of the Fencing Community
-        </h2>
-        <p>
-          Fencing is built around respect and sportsmanship. Good fencers
-          support their teammates, respect opponents, listen to coaches, and
-          contribute positively to the club environment. As you gain experience,
-          you can help newer members, participate in club activities, and become
-          an important part of your fencing community. The journey from beginner
-          to experienced fencer is built one training session at a time.
-        </p>
+      <div id="community-section">
+        <Card className="relative overflow-hidden w-full h-100 border-none rounded-xl mt-6">
+          {/* The background image */}
+          <img
+            src="images/weaponImages/Sabre.jpg"
+            alt="Scenic landscape"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          {/* Dark overlay to ensure text readability */}
+          <div className="absolute inset-0 bg-black/40" />
+          {/* Text Content Container */}
+          <CardContent className="relative z-10 h-full flex flex-col justify-end p-6 text-white">
+            <h3 className="page-title">Becoming Part of the Fencing Club</h3>
+            <p className="text-lg text-gray-200 mt-1">
+              Joining a fencing club is about more than learning how to fence.
+              It is about becoming part of a supportive community where people
+              encourage each other to learn, improve, and enjoy the sport
+              together. Whether you're picking up a sword for the first time or
+              returning after years away, you'll find a place where everyone
+              starts somewhere and every achievement is celebrated.
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </>
   );
