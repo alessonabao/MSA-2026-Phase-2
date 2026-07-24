@@ -5,6 +5,7 @@ import Activities from "@/features/activities/Activities";
 import Profile from "../../features/profile/Profile";
 import { ThemeProvider } from "../../components/theme-provider";
 import NavBar from "./NavBar";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function App() {
   return (
@@ -19,6 +20,8 @@ export default function App() {
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </main>
+
+        <Toaster />
       </BrowserRouter>
     </ThemeProvider>
   );

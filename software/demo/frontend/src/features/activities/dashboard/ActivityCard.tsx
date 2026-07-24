@@ -10,15 +10,46 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+
 // icons
-import { CalendarDays, Wallet, MapPin, Clock7 } from "lucide-react";
+import {
+  CalendarDays,
+  Wallet,
+  MapPin,
+  Clock7,
+  EllipsisVertical,
+  TrashIcon,
+} from "lucide-react";
 
 type Props = {
   activity: Activity;
   selectActivity: (id: string) => void;
+  deleteActivity: (id: string) => void;
 };
 
-export default function ActivityCard({ activity, selectActivity }: Props) {
+export default function ActivityCard({
+  activity,
+  selectActivity,
+  deleteActivity,
+}: Props) {
   return (
     <>
       <Card className="relative mx-auto w-full max-w mb-10 pt-5">
@@ -33,11 +64,67 @@ export default function ActivityCard({ activity, selectActivity }: Props) {
             <Badge id="card-activity-type" variant="secondary">
               {activity.type}
             </Badge>
+            {/* Delete event menu */}
+            <AlertDialog>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="ml-auto">
+                    <EllipsisVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end">
+                  <AlertDialogTrigger asChild>
+                    <DropdownMenuItem
+                      onSelect={(e) => e.preventDefault()}
+                      className="text-destructive"
+                    >
+                      <TrashIcon />
+                      Delete
+                    </DropdownMenuItem>
+                  </AlertDialogTrigger>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete this event?</AlertDialogTitle>
+
+                  <AlertDialogDescription>
+                    This will permanently remove{" "}
+                    <strong>{activity.title}</strong>. This action cannot be
+                    undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+                  <AlertDialogAction
+                    variant="destructive"
+                    onClick={() => {
+                      deleteActivity(activity.id);
+
+                      toast.success("Event deleted", {
+                        description: `"${activity.title}" has been deleted successfully.`,
+                        style: {
+                          background: "#16a34a", // green-600
+                          color: "#ffffff",
+                        },
+                      });
+                    }}
+                  >
+                    <TrashIcon />
+                    Delete Event
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardAction>
           <CardTitle id="card-activity-title">{activity.title}</CardTitle>
           <CardDescription
             id="card-activity-description"
-            className="line-clamp-2"
+            className="line-clamp-2 pt-4"
           >
             {activity.description}
           </CardDescription>

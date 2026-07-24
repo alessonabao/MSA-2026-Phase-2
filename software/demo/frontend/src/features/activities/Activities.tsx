@@ -53,6 +53,12 @@ export default function Activities() {
     setEditMode(false);
   };
 
+  const handleDelete = (id: string) => {
+    setClubActivities(
+      clubActivities.filter((clubActivity) => clubActivity.id !== id),
+    );
+  };
+
   return (
     <>
       <div>
@@ -82,6 +88,7 @@ export default function Activities() {
           openForm={handleOpenForm}
           closeForm={handleFormClose}
           submitForm={handleSubmitForm}
+          deleteActivity={handleDelete}
         />
       </div>
     </>
