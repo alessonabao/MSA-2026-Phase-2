@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -48,6 +48,7 @@ import type { Activity } from "@/lib/types";
 type Props = {
   activity?: Activity;
   closeForm: () => void;
+  submitForm: (activity: Activity) => void;
 };
 
 const formSchema = z
@@ -133,7 +134,7 @@ function isValidDate(date: Date | undefined) {
   return !isNaN(date.getTime());
 }
 
-export function ActivityForm({ activity, closeForm }: Props) {
+export function ActivityForm({ activity, closeForm, submitForm }: Props) {
   // date
   const [dateOpen, setDateOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -149,8 +150,8 @@ export function ActivityForm({ activity, closeForm }: Props) {
     defaultValues: {
       title: "",
       date: new Date(),
-      startTime: "18:30",
-      endTime: "21:00",
+      startTime: "",
+      endTime: "",
       description: "",
       weapon: "Mixed",
       skillLevel: "Beginner",
@@ -161,14 +162,53 @@ export function ActivityForm({ activity, closeForm }: Props) {
     },
   });
 
+  useEffect(() => {
+    form.reset({
+      title: activity?.title ?? "",
+      date: activity?.date ? new Date(activity.date) : new Date(),
+      startTime: activity?.startTime ?? "",
+      endTime: activity?.endTime ?? "",
+      description: activity?.description ?? "",
+      weapon: activity?.weapon ?? "Mixed",
+      skillLevel: activity?.skillLevel ?? "Beginner",
+      type: activity?.type ?? "Training",
+      city: activity?.city ?? "",
+      venue: activity?.venue ?? "",
+      price: activity?.price ?? 0,
+    });
+  }, [activity, form]);
+
   function onSubmit(data: z.output<typeof formSchema>) {
-    console.log("Submitted form: ", data);
+    // if (activity) {
+    //   data.title = activity.title;
+    // }
+    const activityData: Activity = {
+      id: activity?.id ?? "",
+      title: data.title,
+      date: data.date.toISOString(),
+      startTime: data.startTime,
+      endTime: data.endTime,
+      description: data.description,
+      weapon: data.weapon,
+      skillLevel: data.skillLevel,
+      type: data.type,
+      isCancelled: activity?.isCancelled ?? false,
+      city: data.city,
+      venue: data.venue,
+      latitude: activity?.latitude ?? 0,
+      longitude: activity?.longitude ?? 0,
+      price: data.price,
+    };
+
+    submitForm(activityData);
   }
 
   return (
     <Card className="w-full sm:max-w-md">
       <CardHeader>
-        <CardTitle>Create a club activity: {activity?.title}</CardTitle>
+        <CardTitle className="text-2xl font-bold">
+          {activity ? "Edit Event Information" : "Create an Event"}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form id="form-activity" onSubmit={form.handleSubmit(onSubmit)}>
@@ -215,7 +255,7 @@ export function ActivityForm({ activity, closeForm }: Props) {
                     />
                     <InputGroupAddon align="block-end">
                       <InputGroupText className="tabular-nums">
-                        {field.value.length}/100 characters
+                        {field.value?.length ?? 0}/100 characters
                       </InputGroupText>
                     </InputGroupAddon>
                   </InputGroup>
@@ -495,15 +535,14 @@ export function ActivityForm({ activity, closeForm }: Props) {
       </CardContent>
       <CardFooter>
         <Field orientation="horizontal">
-          {/* <Button
-            id="form-reset"
+          <Button
+            id="form-close"
             type="button"
             variant="outline"
-            onClick={() => form.reset()}
+            onClick={closeForm}
           >
-            Reset
-          </Button> */}
-          <Button onClick={closeForm}>Close</Button>
+            Close
+          </Button>
           <Button id="form-submit" type="submit" form="form-activity">
             Submit
           </Button>

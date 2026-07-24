@@ -38,6 +38,21 @@ export default function Activities() {
     setEditMode(false);
   };
 
+  const handleSubmitForm = (activity: Activity) => {
+    if (activity.id) {
+      setClubActivities(
+        clubActivities.map((clubActivity) =>
+          clubActivity.id === activity.id ? activity : clubActivity,
+        ),
+      );
+    } else {
+      const newActivity = { ...activity, id: clubActivities.length.toString() };
+      setSelectedActivity(newActivity);
+      setClubActivities([...clubActivities, newActivity]);
+    }
+    setEditMode(false);
+  };
+
   return (
     <>
       <div>
@@ -66,6 +81,7 @@ export default function Activities() {
           editMode={editMode}
           openForm={handleOpenForm}
           closeForm={handleFormClose}
+          submitForm={handleSubmitForm}
         />
       </div>
     </>
