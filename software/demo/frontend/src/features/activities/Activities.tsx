@@ -30,8 +30,8 @@ export default function Activities() {
       handleSelectActivity(id);
     } else {
       handleCancelSelectActivity();
-      setEditMode(true);
     }
+    setEditMode(true);
   };
 
   const handleFormClose = () => {
