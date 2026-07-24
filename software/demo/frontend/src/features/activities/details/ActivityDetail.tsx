@@ -14,11 +14,13 @@ import { CalendarDays } from "lucide-react";
 type Props = {
   activity: Activity;
   cancelSelectActivity: () => void;
+  openForm: (id: string) => void;
 };
 
 export default function ActivityDetail({
   activity,
   cancelSelectActivity,
+  openForm,
 }: Props) {
   return (
     <>
@@ -40,8 +42,8 @@ export default function ActivityDetail({
             <span className="text-sm">{activity.date}</span>
           </div>
         </CardContent>
-        <CardFooter className="grid grid-rows-2">
-          <Button>Edit</Button>
+        <CardFooter className="grid grid-rows-2 gap-2">
+          <Button onClick={() => openForm(activity.id)}>Edit</Button>
           <Button variant="secondary" onClick={cancelSelectActivity}>
             Cancel
           </Button>

@@ -43,6 +43,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Activity } from "@/lib/types";
+
+type Props = {
+  activity?: Activity;
+  closeForm: () => void;
+};
 
 const formSchema = z
   .object({
@@ -127,7 +133,7 @@ function isValidDate(date: Date | undefined) {
   return !isNaN(date.getTime());
 }
 
-export function ActivityForm() {
+export function ActivityForm({ activity, closeForm }: Props) {
   // date
   const [dateOpen, setDateOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -162,7 +168,7 @@ export function ActivityForm() {
   return (
     <Card className="w-full sm:max-w-md">
       <CardHeader>
-        <CardTitle>Create a club activity</CardTitle>
+        <CardTitle>Create a club activity: {activity?.title}</CardTitle>
       </CardHeader>
       <CardContent>
         <form id="form-activity" onSubmit={form.handleSubmit(onSubmit)}>
@@ -489,14 +495,15 @@ export function ActivityForm() {
       </CardContent>
       <CardFooter>
         <Field orientation="horizontal">
-          <Button
+          {/* <Button
             id="form-reset"
             type="button"
             variant="outline"
             onClick={() => form.reset()}
           >
             Reset
-          </Button>
+          </Button> */}
+          <Button onClick={closeForm}>Close</Button>
           <Button id="form-submit" type="submit" form="form-activity">
             Submit
           </Button>

@@ -73,12 +73,15 @@ export default function NavBar() {
           <ModeToggle />
 
           {/* Desktop button */}
-          <Button
+          {/* <Button
             id="nav-create-event-btn"
             size="lg"
             className="hidden md:flex"
           >
             Create an Event
+          </Button> */}
+          <Button id="nav-login-btn" size="lg" className="hidden md:flex">
+            Login
           </Button>
 
           {/* Mobile navigation */}
@@ -134,11 +137,14 @@ export default function NavBar() {
                   Profile
                 </NavLink>
 
-                <Button
+                {/* <Button
                   id="mobile-nav-create-event-btn"
                   className="mt-4 w-full"
                 >
                   Create an Event
+                </Button> */}
+                <Button id="mobile-nav-login-btn" className="mt-4 w-full">
+                  Login
                 </Button>
               </div>
             </SheetContent>
