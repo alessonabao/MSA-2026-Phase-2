@@ -10,18 +10,27 @@ import {
 } from "@/components/ui/card";
 // icons
 import { CalendarDays } from "lucide-react";
+import { useActivities } from "@/lib/hooks/useActivities";
 
 type Props = {
-  activity: Activity;
+  selectedActivity: Activity;
   cancelSelectActivity: () => void;
   openForm: (id: string) => void;
 };
 
 export default function ActivityDetail({
-  activity,
+  selectedActivity,
   cancelSelectActivity,
   openForm,
 }: Props) {
+  const { activities } = useActivities();
+  const activity = activities?.find(
+    (activi) => activi.id === selectedActivity.id,
+  );
+
+  if (!activity) {
+    return "Loading...";
+  }
   return (
     <>
       <Card className="relative mx-auto w-full max-w-sm pt-0">

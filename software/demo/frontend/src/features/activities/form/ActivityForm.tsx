@@ -44,11 +44,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Activity } from "@/lib/types";
+import { useActivities } from "@/lib/hooks/useActivities";
 
 type Props = {
   activity?: Activity;
   closeForm: () => void;
-  submitForm: (activity: Activity) => void;
 };
 
 const formSchema = z
@@ -134,12 +134,12 @@ function isValidDate(date: Date | undefined) {
   return !isNaN(date.getTime());
 }
 
-export function ActivityForm({ activity, closeForm, submitForm }: Props) {
-  // date
+export function ActivityForm({ activity, closeForm }: Props) {
   const [dateOpen, setDateOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [dateMonth, setDateMonth] = useState<Date | undefined>(date);
   const [dateValue, setDateValue] = useState(formatDate(date));
+  const { updateActivity } = useActivities();
 
   const form = useForm<
     z.output<typeof formSchema>,
@@ -178,10 +178,7 @@ export function ActivityForm({ activity, closeForm, submitForm }: Props) {
     });
   }, [activity, form]);
 
-  function onSubmit(data: z.output<typeof formSchema>) {
-    // if (activity) {
-    //   data.title = activity.title;
-    // }
+  async function onSubmit(data: z.output<typeof formSchema>) {
     const activityData: Activity = {
       id: activity?.id ?? "",
       title: data.title,
@@ -200,7 +197,11 @@ export function ActivityForm({ activity, closeForm, submitForm }: Props) {
       price: data.price,
     };
 
-    submitForm(activityData);
+    if (activity) {
+      // data.id = activity.id;
+      await updateActivity.mutateAsync(activityData);
+      closeForm();
+    }
   }
 
   return (
@@ -543,7 +544,12 @@ export function ActivityForm({ activity, closeForm, submitForm }: Props) {
           >
             Close
           </Button>
-          <Button id="form-submit" type="submit" form="form-activity">
+          <Button
+            id="form-submit"
+            type="submit"
+            form="form-activity"
+            disabled={updateActivity.isPending}
+          >
             Submit
           </Button>
         </Field>
