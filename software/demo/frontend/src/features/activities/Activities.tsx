@@ -1,24 +1,18 @@
 import type { Activity } from "@/lib/types";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ActivitiesDashboard from "./dashboard/ActivitiesDashboard";
 import { Button } from "@/components/ui/button";
+import { useActivities } from "@/lib/hooks/useActivities";
 
 export default function Activities() {
-  const [clubActivities, setClubActivities] = useState<Activity[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<
     Activity | undefined
   >(undefined);
   const [editMode, setEditMode] = useState(false);
-
-  useEffect(() => {
-    axios
-      .get<Activity[]>("http://localhost:5000/api/activities")
-      .then((response) => setClubActivities(response.data));
-  }, []);
+  const { activities, isPending } = useActivities();
 
   const handleSelectActivity = (id: string) => {
-    setSelectedActivity(clubActivities.find((activity) => activity.id === id));
+    setSelectedActivity(activities!.find((activity) => activity.id === id));
   };
 
   const handleCancelSelectActivity = () => {
@@ -39,24 +33,26 @@ export default function Activities() {
   };
 
   const handleSubmitForm = (activity: Activity) => {
-    if (activity.id) {
-      setClubActivities(
-        clubActivities.map((clubActivity) =>
-          clubActivity.id === activity.id ? activity : clubActivity,
-        ),
-      );
-    } else {
-      const newActivity = { ...activity, id: clubActivities.length.toString() };
-      setSelectedActivity(newActivity);
-      setClubActivities([...clubActivities, newActivity]);
-    }
+    // if (activity.id) {
+    //   setClubActivities(
+    //     clubActivities.map((clubActivity) =>
+    //       clubActivity.id === activity.id ? activity : clubActivity,
+    //     ),
+    //   );
+    // } else {
+    //   const newActivity = { ...activity, id: clubActivities.length.toString() };
+    //   setSelectedActivity(newActivity);
+    //   setClubActivities([...clubActivities, newActivity]);
+    // }
+    console.log(activity);
     setEditMode(false);
   };
 
   const handleDelete = (id: string) => {
-    setClubActivities(
-      clubActivities.filter((clubActivity) => clubActivity.id !== id),
-    );
+    // setClubActivities(
+    //   clubActivities.filter((clubActivity) => clubActivity.id !== id),
+    // );
+    console.log(id);
   };
 
   return (
@@ -78,18 +74,21 @@ export default function Activities() {
             </Button>
           </div>
         </div>
-
-        <ActivitiesDashboard
-          activities={clubActivities}
-          selectActivity={handleSelectActivity}
-          cancelSelectActivity={handleCancelSelectActivity}
-          selectedActivity={selectedActivity}
-          editMode={editMode}
-          openForm={handleOpenForm}
-          closeForm={handleFormClose}
-          submitForm={handleSubmitForm}
-          deleteActivity={handleDelete}
-        />
+        {!activities || isPending ? (
+          <h1>Loading...</h1>
+        ) : (
+          <ActivitiesDashboard
+            activities={activities}
+            selectActivity={handleSelectActivity}
+            cancelSelectActivity={handleCancelSelectActivity}
+            selectedActivity={selectedActivity}
+            editMode={editMode}
+            openForm={handleOpenForm}
+            closeForm={handleFormClose}
+            submitForm={handleSubmitForm}
+            deleteActivity={handleDelete}
+          />
+        )}
       </div>
     </>
   );
