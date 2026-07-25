@@ -11,7 +11,6 @@ type Props = {
   editMode: boolean;
   openForm: (id: string) => void;
   closeForm: () => void;
-  deleteActivity: (id: string) => void;
 };
 
 export default function ActivitiesDashboard({
@@ -22,7 +21,6 @@ export default function ActivitiesDashboard({
   editMode,
   openForm,
   closeForm,
-  deleteActivity,
 }: Props) {
   return (
     <>
@@ -32,7 +30,6 @@ export default function ActivitiesDashboard({
           <ActivityList
             activities={activities}
             selectActivity={selectActivity}
-            deleteActivity={deleteActivity}
           />
         </div>
 

@@ -38,18 +38,16 @@ import {
   EllipsisVertical,
   TrashIcon,
 } from "lucide-react";
+import { useActivities } from "@/lib/hooks/useActivities";
 
 type Props = {
   activity: Activity;
   selectActivity: (id: string) => void;
-  deleteActivity: (id: string) => void;
 };
 
-export default function ActivityCard({
-  activity,
-  selectActivity,
-  deleteActivity,
-}: Props) {
+export default function ActivityCard({ activity, selectActivity }: Props) {
+  const { deleteActivity } = useActivities();
+
   return (
     <>
       <Card className="relative mx-auto w-full max-w mb-10 pt-5">
@@ -102,8 +100,9 @@ export default function ActivityCard({
 
                   <AlertDialogAction
                     variant="destructive"
+                    disabled={deleteActivity.isPending}
                     onClick={() => {
-                      deleteActivity(activity.id);
+                      deleteActivity.mutate(activity.id);
 
                       toast.success("Event deleted", {
                         description: `"${activity.title}" has been deleted successfully.`,
