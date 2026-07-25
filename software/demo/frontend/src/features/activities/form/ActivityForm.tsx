@@ -139,7 +139,7 @@ export function ActivityForm({ activity, closeForm }: Props) {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [dateMonth, setDateMonth] = useState<Date | undefined>(date);
   const [dateValue, setDateValue] = useState(formatDate(date));
-  const { updateActivity } = useActivities();
+  const { updateActivity, createActivity } = useActivities();
 
   const form = useForm<
     z.output<typeof formSchema>,
@@ -200,6 +200,9 @@ export function ActivityForm({ activity, closeForm }: Props) {
     if (activity) {
       // data.id = activity.id;
       await updateActivity.mutateAsync(activityData);
+      closeForm();
+    } else {
+      await createActivity.mutateAsync(activityData);
       closeForm();
     }
   }
@@ -548,7 +551,7 @@ export function ActivityForm({ activity, closeForm }: Props) {
             id="form-submit"
             type="submit"
             form="form-activity"
-            disabled={updateActivity.isPending}
+            disabled={updateActivity.isPending || createActivity.isPending}
           >
             Submit
           </Button>
