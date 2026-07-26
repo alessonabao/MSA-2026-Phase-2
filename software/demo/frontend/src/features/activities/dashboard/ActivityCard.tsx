@@ -42,10 +42,9 @@ import { useActivities } from "@/lib/hooks/useActivities";
 
 type Props = {
   activity: Activity;
-  selectActivity: (id: string) => void;
 };
 
-export default function ActivityCard({ activity, selectActivity }: Props) {
+export default function ActivityCard({ activity }: Props) {
   const { deleteActivity } = useActivities();
 
   return (
@@ -170,7 +169,7 @@ export default function ActivityCard({ activity, selectActivity }: Props) {
           <Button
             id="card-view-event-btn"
             className="w-full"
-            onClick={() => selectActivity(activity.id)}
+            onClick={() => {}}
           >
             View Event
           </Button>

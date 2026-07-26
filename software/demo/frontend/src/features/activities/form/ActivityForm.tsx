@@ -46,11 +46,6 @@ import {
 import type { Activity } from "@/lib/types";
 import { useActivities } from "@/lib/hooks/useActivities";
 
-type Props = {
-  activity?: Activity;
-  closeForm: () => void;
-};
-
 const formSchema = z
   .object({
     title: z
@@ -134,7 +129,8 @@ function isValidDate(date: Date | undefined) {
   return !isNaN(date.getTime());
 }
 
-export function ActivityForm({ activity, closeForm }: Props) {
+export function ActivityForm() {
+  const activity = {} as Activity;
   const [dateOpen, setDateOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [dateMonth, setDateMonth] = useState<Date | undefined>(date);
@@ -200,10 +196,8 @@ export function ActivityForm({ activity, closeForm }: Props) {
     if (activity) {
       // data.id = activity.id;
       await updateActivity.mutateAsync(activityData);
-      closeForm();
     } else {
       await createActivity.mutateAsync(activityData);
-      closeForm();
     }
   }
 
@@ -539,12 +533,7 @@ export function ActivityForm({ activity, closeForm }: Props) {
       </CardContent>
       <CardFooter>
         <Field orientation="horizontal">
-          <Button
-            id="form-close"
-            type="button"
-            variant="outline"
-            onClick={closeForm}
-          >
+          <Button id="form-close" type="button" variant="outline">
             Close
           </Button>
           <Button

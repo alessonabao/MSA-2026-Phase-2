@@ -1,37 +1,7 @@
-import type { Activity } from "@/lib/types";
-import { useState } from "react";
 import ActivitiesDashboard from "./dashboard/ActivitiesDashboard";
 import { Button } from "@/components/ui/button";
-import { useActivities } from "@/lib/hooks/useActivities";
 
 export default function Activities() {
-  const [selectedActivity, setSelectedActivity] = useState<
-    Activity | undefined
-  >(undefined);
-  const [editMode, setEditMode] = useState(false);
-  const { activities, isPending } = useActivities();
-
-  const handleSelectActivity = (id: string) => {
-    setSelectedActivity(activities!.find((activity) => activity.id === id));
-  };
-
-  const handleCancelSelectActivity = () => {
-    setSelectedActivity(undefined);
-  };
-
-  const handleOpenForm = (id?: string) => {
-    if (id) {
-      handleSelectActivity(id);
-    } else {
-      handleCancelSelectActivity();
-    }
-    setEditMode(true);
-  };
-
-  const handleFormClose = () => {
-    setEditMode(false);
-  };
-
   return (
     <>
       <div>
@@ -45,25 +15,13 @@ export default function Activities() {
             <Button
               id="create-event-btn"
               className="px-8 py-4 text-lg"
-              onClick={() => handleOpenForm()}
+              onClick={() => {}}
             >
               Create an Event
             </Button>
           </div>
         </div>
-        {!activities || isPending ? (
-          <h1>Loading...</h1>
-        ) : (
-          <ActivitiesDashboard
-            activities={activities}
-            selectActivity={handleSelectActivity}
-            cancelSelectActivity={handleCancelSelectActivity}
-            selectedActivity={selectedActivity}
-            editMode={editMode}
-            openForm={handleOpenForm}
-            closeForm={handleFormClose}
-          />
-        )}
+        <ActivitiesDashboard />
       </div>
     </>
   );
