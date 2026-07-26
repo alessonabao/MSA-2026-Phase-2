@@ -46,7 +46,9 @@ export default function ActivityDetail() {
           </div>
         </CardContent>
         <CardFooter className="grid grid-rows-2 gap-2">
-          <Button onClick={() => navigate(`${activity.id}`)}>Edit</Button>
+          <Button onClick={() => navigate(`/manage/${activity.id}`)}>
+            Edit
+          </Button>
           <Button variant="secondary" onClick={() => navigate("/activities")}>
             Cancel
           </Button>

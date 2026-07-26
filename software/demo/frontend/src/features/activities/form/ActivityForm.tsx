@@ -45,7 +45,7 @@ import {
 } from "@/components/ui/select";
 import type { Activity } from "@/lib/types";
 import { useActivities } from "@/lib/hooks/useActivities";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 const formSchema = z
   .object({
@@ -131,12 +131,14 @@ function isValidDate(date: Date | undefined) {
 }
 
 export function ActivityForm() {
-  const activity = {} as Activity;
   const [dateOpen, setDateOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [dateMonth, setDateMonth] = useState<Date | undefined>(date);
   const [dateValue, setDateValue] = useState(formatDate(date));
-  const { updateActivity, createActivity } = useActivities();
+
+  const { id } = useParams();
+  const { updateActivity, createActivity, activity, isLoadingActivity } =
+    useActivities(id);
   const navigate = useNavigate();
 
   const form = useForm<
@@ -160,6 +162,22 @@ export function ActivityForm() {
     },
   });
 
+  useEffect(() => {
+    form.reset({
+      title: activity?.title ?? "",
+      date: activity?.date ? new Date(activity.date) : new Date(),
+      startTime: activity?.startTime ?? "",
+      endTime: activity?.endTime ?? "",
+      description: activity?.description ?? "",
+      weapon: activity?.weapon ?? "Mixed",
+      skillLevel: activity?.skillLevel ?? "Beginner",
+      type: activity?.type ?? "Training",
+      city: activity?.city ?? "",
+      venue: activity?.venue ?? "",
+      price: activity?.price ?? 0,
+    });
+  }, [activity, form]);
+
   // useEffect(() => {
   //   form.reset({
   //     title: activity?.title ?? "",
@@ -176,25 +194,9 @@ export function ActivityForm() {
   //   });
   // }, [activity, form]);
 
-  useEffect(() => {
-    form.reset({
-      title: activity?.title ?? "",
-      date: activity?.date ? new Date(activity.date) : new Date(),
-      startTime: activity?.startTime ?? "",
-      endTime: activity?.endTime ?? "",
-      description: activity?.description ?? "",
-      weapon: activity?.weapon ?? "Mixed",
-      skillLevel: activity?.skillLevel ?? "Beginner",
-      type: activity?.type ?? "Training",
-      city: activity?.city ?? "",
-      venue: activity?.venue ?? "",
-      price: activity?.price ?? 0,
-    });
-  }, []);
-
   async function onSubmit(data: z.output<typeof formSchema>) {
     const activityData: Activity = {
-      id: activity?.id ?? "",
+      ...(activity?.id && { id: activity.id }),
       title: data.title,
       date: data.date.toISOString(),
       startTime: data.startTime,
@@ -211,12 +213,20 @@ export function ActivityForm() {
       price: data.price,
     };
 
-    if (activity) {
-      // data.id = activity.id;
+    if (id) {
       await updateActivity.mutateAsync(activityData);
+      navigate(`/activities/${id}`);
     } else {
-      await createActivity.mutateAsync(activityData);
+      createActivity.mutate(activityData, {
+        onSuccess: (id) => {
+          navigate(`/activities/${id}`);
+        },
+      });
     }
+  }
+
+  if (isLoadingActivity) {
+    return "Loading activity...";
   }
 
   return (

@@ -17,7 +17,11 @@ export const useActivities = (id?: string) => {
   // create activity
   const createActivity = useMutation({
     mutationFn: async (activity: Activity) => {
-      await agent.post("/activities", activity);
+      const response = await agent.post("/activities", activity);
+      return response.data;
+    },
+    onError: (error) => {
+      console.error("Create activity failed:", error);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
