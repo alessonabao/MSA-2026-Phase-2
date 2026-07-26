@@ -39,6 +39,7 @@ import {
   TrashIcon,
 } from "lucide-react";
 import { useActivities } from "@/lib/hooks/useActivities";
+import { useNavigate } from "react-router";
 
 type Props = {
   activity: Activity;
@@ -46,6 +47,7 @@ type Props = {
 
 export default function ActivityCard({ activity }: Props) {
   const { deleteActivity } = useActivities();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -169,7 +171,7 @@ export default function ActivityCard({ activity }: Props) {
           <Button
             id="card-view-event-btn"
             className="w-full"
-            onClick={() => {}}
+            onClick={() => navigate(`${activity.id}`)}
           >
             View Event
           </Button>

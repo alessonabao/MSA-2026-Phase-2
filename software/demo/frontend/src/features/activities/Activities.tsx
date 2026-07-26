@@ -18,7 +18,7 @@ export default function Activities() {
           <Button
             id="create-event-btn"
             className="w-full text-lg"
-            onClick={() => navigate("createEvents")}
+            onClick={() => navigate("createActivity")}
           >
             Create an Event
           </Button>

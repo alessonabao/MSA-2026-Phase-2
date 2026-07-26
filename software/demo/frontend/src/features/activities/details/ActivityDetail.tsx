@@ -1,4 +1,3 @@
-import type { Activity } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,27 +9,22 @@ import {
 } from "@/components/ui/card";
 // icons
 import { CalendarDays } from "lucide-react";
+import { useNavigate, useParams } from "react-router";
 import { useActivities } from "@/lib/hooks/useActivities";
 
-type Props = {
-  selectedActivity: Activity;
-  cancelSelectActivity: () => void;
-  openForm: (id: string) => void;
-};
+export default function ActivityDetail() {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const { activity, isLoadingActivity } = useActivities(id);
 
-export default function ActivityDetail({
-  selectedActivity,
-  cancelSelectActivity,
-  openForm,
-}: Props) {
-  const { activities } = useActivities();
-  const activity = activities?.find(
-    (activi) => activi.id === selectedActivity.id,
-  );
-
-  if (!activity) {
+  if (isLoadingActivity) {
     return "Loading...";
   }
+
+  if (!activity) {
+    return "Activity not found";
+  }
+
   return (
     <>
       <Card className="relative mx-auto w-full max-w-sm pt-0">
@@ -52,8 +46,8 @@ export default function ActivityDetail({
           </div>
         </CardContent>
         <CardFooter className="grid grid-rows-2 gap-2">
-          <Button onClick={() => openForm(activity.id)}>Edit</Button>
-          <Button variant="secondary" onClick={cancelSelectActivity}>
+          <Button onClick={() => navigate(`${activity.id}`)}>Edit</Button>
+          <Button variant="secondary" onClick={() => navigate("/activities")}>
             Cancel
           </Button>
         </CardFooter>

@@ -6,6 +6,7 @@ import ErrorPage from "@/features/ErrorPage";
 import Activities from "@/features/activities/Activities";
 import Profile from "@/features/profile/Profile";
 import Resources from "@/features/resources/Resources";
+import ActivityDetail from "@/features/activities/details/ActivityDetail";
 
 export const router = createBrowserRouter([
   {
@@ -15,10 +16,11 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       {
-        path: "events",
+        path: "activities",
         children: [
           { index: true, element: <Activities /> },
-          { path: "createEvents", element: <ActivityForm /> },
+          { path: "createActivity", element: <ActivityForm /> },
+          { path: ":id", element: <ActivityDetail /> },
         ],
       },
       { path: "resources", element: <Resources /> },

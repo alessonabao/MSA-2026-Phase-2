@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/select";
 import type { Activity } from "@/lib/types";
 import { useActivities } from "@/lib/hooks/useActivities";
+import { useNavigate } from "react-router";
 
 const formSchema = z
   .object({
@@ -136,6 +137,7 @@ export function ActivityForm() {
   const [dateMonth, setDateMonth] = useState<Date | undefined>(date);
   const [dateValue, setDateValue] = useState(formatDate(date));
   const { updateActivity, createActivity } = useActivities();
+  const navigate = useNavigate();
 
   const form = useForm<
     z.output<typeof formSchema>,
@@ -562,6 +564,7 @@ export function ActivityForm() {
           type="button"
           variant="outline"
           className="w-full sm:w-auto"
+          onClick={() => navigate("/activities")}
         >
           Close
         </Button>

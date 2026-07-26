@@ -31,7 +31,7 @@ export default function NavBar() {
         {/* Centre — navigation links Hidden on smaller screens. Displayed from the md breakpoint onwards. */}
         <nav className="hidden items-center gap-8 md:flex">
           <NavLink
-            to="/events"
+            to="/activities"
             id="nav-events"
             end
             className={({ isActive }) =>
@@ -94,7 +94,7 @@ export default function NavBar() {
               {/* Mobile navigation menu */}
               <div className="mt-8 ml-8 mr-8 flex flex-col gap-6">
                 <NavLink
-                  to="/events"
+                  to="/activities"
                   id="mobile-nav-events"
                   end
                   className={({ isActive }) =>
