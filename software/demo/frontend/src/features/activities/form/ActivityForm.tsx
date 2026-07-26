@@ -233,7 +233,7 @@ export function ActivityForm() {
     <Card className="mx-auto w-full max-w-5xl">
       <CardHeader className="pb-6">
         <CardTitle className="text-3xl font-bold">
-          {activity ? "Edit Event" : "Create an Event"}
+          {activity ? "Edit an Event" : "Create an Event"}
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
