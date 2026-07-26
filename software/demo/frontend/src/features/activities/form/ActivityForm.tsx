@@ -158,6 +158,22 @@ export function ActivityForm() {
     },
   });
 
+  // useEffect(() => {
+  //   form.reset({
+  //     title: activity?.title ?? "",
+  //     date: activity?.date ? new Date(activity.date) : new Date(),
+  //     startTime: activity?.startTime ?? "",
+  //     endTime: activity?.endTime ?? "",
+  //     description: activity?.description ?? "",
+  //     weapon: activity?.weapon ?? "Mixed",
+  //     skillLevel: activity?.skillLevel ?? "Beginner",
+  //     type: activity?.type ?? "Training",
+  //     city: activity?.city ?? "",
+  //     venue: activity?.venue ?? "",
+  //     price: activity?.price ?? 0,
+  //   });
+  // }, [activity, form]);
+
   useEffect(() => {
     form.reset({
       title: activity?.title ?? "",
@@ -172,7 +188,7 @@ export function ActivityForm() {
       venue: activity?.venue ?? "",
       price: activity?.price ?? 0,
     });
-  }, [activity, form]);
+  }, []);
 
   async function onSubmit(data: z.output<typeof formSchema>) {
     const activityData: Activity = {
@@ -202,21 +218,24 @@ export function ActivityForm() {
   }
 
   return (
-    <Card className="w-full sm:max-w-md">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">
-          {activity ? "Edit Event Information" : "Create an Event"}
+    <Card className="mx-auto w-full max-w-5xl">
+      <CardHeader className="pb-6">
+        <CardTitle className="text-3xl font-bold">
+          {activity ? "Edit Event" : "Create an Event"}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         <form id="form-activity" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
+          <FieldGroup className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Title */}
             <Controller
               name="title"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+                <Field
+                  className="lg:col-span-2"
+                  data-invalid={fieldState.invalid}
+                >
                   <FieldLabel htmlFor="form-title">
                     Club Activity Title
                   </FieldLabel>
@@ -238,7 +257,10 @@ export function ActivityForm() {
               name="description"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+                <Field
+                  className="lg:col-span-2"
+                  data-invalid={fieldState.invalid}
+                >
                   <FieldLabel htmlFor="form-description">
                     Description
                   </FieldLabel>
@@ -248,7 +270,7 @@ export function ActivityForm() {
                       id="form-description"
                       placeholder="Information club members need to know."
                       rows={6}
-                      className="min-h-24 resize-none"
+                      className="min-h-40 resize-y"
                       aria-invalid={fieldState.invalid}
                     />
                     <InputGroupAddon align="block-end">
@@ -493,7 +515,10 @@ export function ActivityForm() {
               name="venue"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+                <Field
+                  className="lg:col-span-2"
+                  data-invalid={fieldState.invalid}
+                >
                   <FieldLabel htmlFor="form-venue">Venue</FieldLabel>
                   <Input
                     {...field}
@@ -531,20 +556,24 @@ export function ActivityForm() {
           </FieldGroup>
         </form>
       </CardContent>
-      <CardFooter>
-        <Field orientation="horizontal">
-          <Button id="form-close" type="button" variant="outline">
-            Close
-          </Button>
-          <Button
-            id="form-submit"
-            type="submit"
-            form="form-activity"
-            disabled={updateActivity.isPending || createActivity.isPending}
-          >
-            Submit
-          </Button>
-        </Field>
+      <CardFooter className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <Button
+          id="form-close"
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto"
+        >
+          Close
+        </Button>
+        <Button
+          id="form-submit"
+          type="submit"
+          form="form-activity"
+          className="w-full sm:w-auto"
+          disabled={updateActivity.isPending || createActivity.isPending}
+        >
+          Submit
+        </Button>
       </CardFooter>
     </Card>
   );

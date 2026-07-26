@@ -13,9 +13,14 @@ export const router = createBrowserRouter([
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
-      { path: "", element: <HomePage /> },
-      { path: "events", element: <Activities /> },
-      { path: "createActivity", element: <ActivityForm /> },
+      { index: true, element: <HomePage /> },
+      {
+        path: "events",
+        children: [
+          { index: true, element: <Activities /> },
+          { path: "createEvents", element: <ActivityForm /> },
+        ],
+      },
       { path: "resources", element: <Resources /> },
       { path: "profile", element: <Profile /> },
     ],
