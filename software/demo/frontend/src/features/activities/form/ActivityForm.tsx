@@ -196,7 +196,7 @@ export function ActivityForm() {
 
   async function onSubmit(data: z.output<typeof formSchema>) {
     const activityData: Activity = {
-      ...(activity?.id && { id: activity.id }),
+      id: activity?.id ?? crypto.randomUUID(),
       title: data.title,
       date: data.date.toISOString(),
       startTime: data.startTime,
