@@ -80,7 +80,7 @@ export default function Resources() {
       {/* Fencing Position */}
       <div>
         <h2 className="section-title">Learning the Basic Fencing Position</h2>
-        <p>
+        <p className="text-justify">
           The first skill every fencer learns is the en garde position. This is
           the ready position used before starting a movement or a bout. A good
           en garde position provides balance and allows you to move quickly in
@@ -110,7 +110,7 @@ export default function Resources() {
             <CardContent className="p-5 space-y-2 grid grid-cols-3 gap-6">
               <div>
                 <h3 className="text-lg font-bold tracking-tight">Advance</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
+                <p className="text-muted-foreground text-sm text-justify leading-relaxed">
                   An advance is a forward movement used to close distance with
                   your opponent. The front foot moves first, followed by the
                   back foot, while maintaining your fencing stance.
@@ -118,7 +118,7 @@ export default function Resources() {
               </div>
               <div>
                 <h3 className="text-lg font-bold tracking-tight">Retreat</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
+                <p className="text-muted-foreground text-sm text-justify leading-relaxed">
                   A retreat moves backwards to create distance or avoid an
                   opponent's attack. The back foot moves first, followed by the
                   front foot.
@@ -126,7 +126,7 @@ export default function Resources() {
               </div>
               <div>
                 <h3 className="text-lg font-bold tracking-tight">Lunge</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
+                <p className="text-muted-foreground text-sm text-justify leading-relaxed">
                   The lunge is an attacking movement where the fencer extends
                   their weapon arm and pushes forward to reach the opponent.
                 </p>
@@ -162,7 +162,7 @@ export default function Resources() {
           {/* Text content */}
           <CardContent className="p-5 space-y-2">
             <div>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm text-justify leading-relaxed">
                 Fencing uses specialised protective equipment designed to keep
                 athletes safe during training and competitions. Beginners
                 usually start with club-provided equipment, including a mask,
@@ -209,7 +209,7 @@ export default function Resources() {
           {/* Text Content Container */}
           <CardContent className="relative z-10 h-full flex flex-col justify-end p-6 text-white">
             <h3 className="page-title">Becoming Part of the Fencing Club</h3>
-            <p className="text-lg text-gray-200 mt-1">
+            <p className="text-lg text-gray-200 text-justify mt-1">
               Joining a fencing club is about more than learning how to fence.
               It is about becoming part of a supportive community where people
               encourage each other to learn, improve, and enjoy the sport

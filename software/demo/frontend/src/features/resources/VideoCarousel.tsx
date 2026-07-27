@@ -100,7 +100,7 @@ export default function VideoCarousel({
                 <h3 className="text-lg font-bold tracking-tight">
                   {item.title}
                 </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
+                <p className="text-muted-foreground text-sm text-justify leading-relaxed">
                   {item.description}
                 </p>
               </CardContent>

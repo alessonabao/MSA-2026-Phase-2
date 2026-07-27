@@ -12,9 +12,6 @@ body {
 }
 
 /* Header styles moved to NavBar.tsx via Tailwind classes */
-p {
-  text-align: justify;
-}
 
 main {
   max-width: 1600px;
