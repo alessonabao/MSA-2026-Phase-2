@@ -20,7 +20,7 @@ export default function ActivityDetailsPage() {
   return (
     <>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="bg-orange-700 lg:col-span-2">
+        <div className="lg:col-span-2">
           <ActivityDetailsHeader />
           <ActivityDetailsDescription />
           <ActivityDetailsForum />
