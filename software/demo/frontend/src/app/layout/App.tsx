@@ -2,6 +2,7 @@ import { Outlet } from "react-router";
 import "./App.css";
 import { ThemeProvider } from "../../components/theme-provider";
 import NavBar from "./NavBar";
+import Footer from "./Footer";
 import { Toaster } from "@/components/ui/sonner";
 
 export default function App() {
@@ -12,7 +13,7 @@ export default function App() {
         <Outlet />
       </main>
       <Toaster />
-
+      <Footer />
       {/* <BrowserRouter>
         <NavBar />
 
