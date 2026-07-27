@@ -25,7 +25,7 @@ export default function ActivityDetailsPage() {
           <ActivityDetailsDescription />
           <ActivityDetailsForum />
         </div>
-        <div className="bg-green-700">
+        <div>
           <ActivityDetailsSidebar />
         </div>
       </div>
