@@ -1,13 +1,40 @@
 using System;
+using System.Linq;
 using backend.Data;
 using backend.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace backend.data;
 
 public class DbSeedData
 {
-          public static async Task SeedData(AppDbContext context)
+          public static async Task SeedData(AppDbContext context, UserManager<User> userManager)
           {
+                    // check if you have users
+                    if (!userManager.Users.Any())
+                    {
+                              var users = new List<User>
+                              {
+                                        new() {ProfileName = "Alesson", UserName = "alesson@test.com", Email = "alesson@test.com"},
+                                        new() {ProfileName = "Fencing Club", UserName = "fencingclub@test.com", Email = "fencingclub@test.com"}
+
+                              };
+
+                              foreach(var user in users)
+                              {
+                                        var result = await userManager.CreateAsync(user, "EnGarde!2");
+
+                                        // CreateAsync doesn't throw on a rejected password (e.g. fails
+                                        // Identity's strength rules) - it just returns Succeeded = false,
+                                        // so we have to check the result ourselves to catch that.
+                                        if (!result.Succeeded)
+                                        {
+                                                  var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                                                  throw new InvalidOperationException($"Failed to seed user '{user.Email}': {errors}");
+                                        }
+                              }
+                    }
+
                     // check if there's any events table in the database
                     if(context.ClubActivities.Any()) return;
 
