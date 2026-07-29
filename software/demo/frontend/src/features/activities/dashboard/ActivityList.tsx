@@ -1,20 +1,28 @@
-import type { Activity } from "@/lib/types";
 import ActivityCard from "./ActivityCard";
+import { useActivities } from "@/lib/hooks/useActivities";
+import { filterActivities, type ActivityFilters } from "./ActivityFilters";
 
 type Props = {
-  activities: Activity[];
-  selectActivity: (id: string) => void;
+  filters: ActivityFilters;
 };
 
-function ActivityList({ activities, selectActivity }: Props) {
+function ActivityList({ filters }: Props) {
+  const { activities, isPending } = useActivities();
+
+  if (!activities || isPending) {
+    return "Loading...";
+  }
+
+  const filteredActivities = filterActivities(activities, filters);
+
+  if (filteredActivities.length === 0) {
+    return "No activities match the selected filters.";
+  }
+
   return (
     <>
-      {activities.map((activity) => (
-        <ActivityCard
-          key={activity.id}
-          activity={activity}
-          selectActivity={selectActivity}
-        />
+      {filteredActivities.map((activity) => (
+        <ActivityCard key={activity.id} activity={activity} />
       ))}
     </>
   );

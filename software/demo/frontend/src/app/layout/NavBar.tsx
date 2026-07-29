@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 import { Menu } from "lucide-react";
 
 import { ModeToggle } from "@/components/mode-toggle";
@@ -15,7 +15,7 @@ export default function NavBar() {
       {/* Main navbar container */}
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left — branding */}
-        <div className="flex items-center gap-3">
+        <NavLink to="/" className="flex items-center gap-3">
           <img
             src={
               theme === "dark"
@@ -26,12 +26,12 @@ export default function NavBar() {
             className="h-9 w-9"
           />
           <h1 className="text-lg font-semibold tracking-wide">En Garde</h1>
-        </div>
+        </NavLink>
 
         {/* Centre — navigation links Hidden on smaller screens. Displayed from the md breakpoint onwards. */}
         <nav className="hidden items-center gap-8 md:flex">
           <NavLink
-            to="/"
+            to="/activities"
             id="nav-events"
             end
             className={({ isActive }) =>
@@ -73,12 +73,8 @@ export default function NavBar() {
           <ModeToggle />
 
           {/* Desktop button */}
-          <Button
-            id="nav-create-event-btn"
-            size="lg"
-            className="hidden md:flex"
-          >
-            Create an Event
+          <Button id="nav-login-btn" size="lg" className="hidden md:flex">
+            Login
           </Button>
 
           {/* Mobile navigation */}
@@ -96,9 +92,9 @@ export default function NavBar() {
 
             <SheetContent side="right">
               {/* Mobile navigation menu */}
-              <div className="mt-8 flex flex-col gap-6">
+              <div className="mt-8 ml-8 mr-8 flex flex-col gap-6">
                 <NavLink
-                  to="/"
+                  to="/activities"
                   id="mobile-nav-events"
                   end
                   className={({ isActive }) =>
@@ -134,11 +130,8 @@ export default function NavBar() {
                   Profile
                 </NavLink>
 
-                <Button
-                  id="mobile-nav-create-event-btn"
-                  className="mt-4 w-full"
-                >
-                  Create an Event
+                <Button id="mobile-nav-login-btn" className="mt-4 w-full">
+                  Login
                 </Button>
               </div>
             </SheetContent>

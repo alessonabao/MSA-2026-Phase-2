@@ -2,12 +2,20 @@ using backend.Activities.Queries;
 using backend.Core;
 using backend.data;
 using backend.Data;
+using backend.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(opt =>
+{
+    var userPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    opt.Filters.Add(new AuthorizeFilter(userPolicy));
+});
 builder.Services.AddOpenApi();
 
 // Add SQLite DB, refer to appsettings.json
@@ -22,6 +30,14 @@ builder.Services.AddMediatR(medi => medi.RegisterServicesFromAssemblyContaining<
 // register AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
+// register identity
+builder.Services.AddIdentityApiEndpoints<User>(opt =>
+{
+    opt.User.RequireUniqueEmail = true;
+})
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<AppDbContext>();
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -33,11 +49,13 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseCors();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapOpenApi();
 app.MapScalarApiReference();
 app.MapControllers();
+app.MapGroup("api").MapIdentityApi<User>();
 
 // create a service scope: when function goes out of scope (run the app using app.Run()), 
 // anything used will be disposed by the framework 
@@ -49,12 +67,13 @@ try
 {
           // give access to db context to query to db
           var context = services.GetRequiredService<AppDbContext>();
+          var userManager = services.GetRequiredService<UserManager<User>>();
 
           // creates a database when there's no db or apply pending migrations
           await context.Database.MigrateAsync();
 
           // seed data in db
-          await DbSeedData.SeedData(context);
+          await DbSeedData.SeedData(context, userManager);
 }
 catch(Exception ex)
 {
@@ -62,7 +81,7 @@ catch(Exception ex)
           // or init steps to make sure app fails immediately if logging is misconfigured
           var logger = services.GetRequiredService<ILogger<Program>>();
           // log any exception
-          logger.LogError(ex, "backend[Program.cs]: An error occurred during migration.");
+          logger.LogError(ex, "backend[Program.cs]: An error occurred during migration or seeding.");
 }
 
 app.Run();

@@ -1,43 +1,28 @@
-import type { Activity } from "@/lib/types";
+import { useState } from "react";
 import ActivityList from "./ActivityList";
-import ActivityDetail from "../details/ActivityDetail";
-import { ActivityForm } from "../form/ActivityForm";
+import ActivityDashboardSidebar from "./ActivityDashboardSidebar";
+import { DEFAULT_ACTIVITY_FILTERS } from "./ActivityFilters";
+import { useActivities } from "@/lib/hooks/useActivities";
 
-type Props = {
-  activities: Activity[];
-  selectActivity: (id: string) => void;
-  cancelSelectActivity: () => void;
-  selectedActivity?: Activity;
-};
+export default function ActivitiesDashboard() {
+  const [filters, setFilters] = useState(DEFAULT_ACTIVITY_FILTERS);
+  const { activities } = useActivities();
 
-export default function ActivitiesDashboard({
-  activities,
-  selectActivity,
-  cancelSelectActivity,
-  selectedActivity,
-}: Props) {
   return (
-    <>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[7fr_3fr]">
-        {/* Events Cards*/}
-        <div>
-          <ActivityList
-            activities={activities}
-            selectActivity={selectActivity}
-          />
-        </div>
-
-        {/* Events Actions */}
-        <div>
-          {selectedActivity && (
-            <ActivityDetail
-              activity={selectedActivity}
-              cancelSelectActivity={cancelSelectActivity}
-            />
-          )}
-          <ActivityForm />
-        </div>
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[7fr_3fr]">
+      {/* Events Cards*/}
+      <div className="pt-4">
+        <ActivityList filters={filters} />
       </div>
-    </>
+
+      {/* Events Actions */}
+      <div className="pt-4">
+        <ActivityDashboardSidebar
+          filters={filters}
+          onFiltersChange={setFilters}
+          activities={activities}
+        />
+      </div>
+    </div>
   );
 }

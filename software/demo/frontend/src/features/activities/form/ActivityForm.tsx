@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -43,6 +43,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Activity } from "@/lib/types";
+import { useActivities } from "@/lib/hooks/useActivities";
+import { useNavigate, useParams } from "react-router";
 
 const formSchema = z
   .object({
@@ -128,11 +131,15 @@ function isValidDate(date: Date | undefined) {
 }
 
 export function ActivityForm() {
-  // date
   const [dateOpen, setDateOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [dateMonth, setDateMonth] = useState<Date | undefined>(date);
   const [dateValue, setDateValue] = useState(formatDate(date));
+
+  const { id } = useParams();
+  const { updateActivity, createActivity, activity, isLoadingActivity } =
+    useActivities(id);
+  const navigate = useNavigate();
 
   const form = useForm<
     z.output<typeof formSchema>,
@@ -143,8 +150,8 @@ export function ActivityForm() {
     defaultValues: {
       title: "",
       date: new Date(),
-      startTime: "18:30",
-      endTime: "21:00",
+      startTime: "",
+      endTime: "",
       description: "",
       weapon: "Mixed",
       skillLevel: "Beginner",
@@ -155,24 +162,92 @@ export function ActivityForm() {
     },
   });
 
-  function onSubmit(data: z.output<typeof formSchema>) {
-    console.log("Submitted form: ", data);
+  useEffect(() => {
+    form.reset({
+      title: activity?.title ?? "",
+      date: activity?.date ? new Date(activity.date) : new Date(),
+      startTime: activity?.startTime ?? "",
+      endTime: activity?.endTime ?? "",
+      description: activity?.description ?? "",
+      weapon: activity?.weapon ?? "Mixed",
+      skillLevel: activity?.skillLevel ?? "Beginner",
+      type: activity?.type ?? "Training",
+      city: activity?.city ?? "",
+      venue: activity?.venue ?? "",
+      price: activity?.price ?? 0,
+    });
+  }, [activity, form]);
+
+  // useEffect(() => {
+  //   form.reset({
+  //     title: activity?.title ?? "",
+  //     date: activity?.date ? new Date(activity.date) : new Date(),
+  //     startTime: activity?.startTime ?? "",
+  //     endTime: activity?.endTime ?? "",
+  //     description: activity?.description ?? "",
+  //     weapon: activity?.weapon ?? "Mixed",
+  //     skillLevel: activity?.skillLevel ?? "Beginner",
+  //     type: activity?.type ?? "Training",
+  //     city: activity?.city ?? "",
+  //     venue: activity?.venue ?? "",
+  //     price: activity?.price ?? 0,
+  //   });
+  // }, [activity, form]);
+
+  async function onSubmit(data: z.output<typeof formSchema>) {
+    const activityData: Activity = {
+      id: activity?.id ?? crypto.randomUUID(),
+      title: data.title,
+      date: data.date.toISOString(),
+      startTime: data.startTime,
+      endTime: data.endTime,
+      description: data.description,
+      weapon: data.weapon,
+      skillLevel: data.skillLevel,
+      type: data.type,
+      isCancelled: activity?.isCancelled ?? false,
+      city: data.city,
+      venue: data.venue,
+      latitude: activity?.latitude ?? 0,
+      longitude: activity?.longitude ?? 0,
+      price: data.price,
+    };
+
+    if (id) {
+      await updateActivity.mutateAsync(activityData);
+      navigate(`/activities/${id}`);
+    } else {
+      createActivity.mutate(activityData, {
+        onSuccess: (id) => {
+          navigate(`/activities/${id}`);
+        },
+      });
+    }
+  }
+
+  if (isLoadingActivity) {
+    return "Loading activity...";
   }
 
   return (
-    <Card className="w-full sm:max-w-md">
-      <CardHeader>
-        <CardTitle>Create a club activity</CardTitle>
+    <Card className="mx-auto w-full max-w-5xl">
+      <CardHeader className="pb-6">
+        <CardTitle className="text-3xl font-bold">
+          {activity ? "Edit an Event" : "Create an Event"}
+        </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         <form id="form-activity" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
+          <FieldGroup className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Title */}
             <Controller
               name="title"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+                <Field
+                  className="lg:col-span-2"
+                  data-invalid={fieldState.invalid}
+                >
                   <FieldLabel htmlFor="form-title">
                     Club Activity Title
                   </FieldLabel>
@@ -194,7 +269,10 @@ export function ActivityForm() {
               name="description"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+                <Field
+                  className="lg:col-span-2"
+                  data-invalid={fieldState.invalid}
+                >
                   <FieldLabel htmlFor="form-description">
                     Description
                   </FieldLabel>
@@ -204,12 +282,12 @@ export function ActivityForm() {
                       id="form-description"
                       placeholder="Information club members need to know."
                       rows={6}
-                      className="min-h-24 resize-none"
+                      className="min-h-40 resize-y"
                       aria-invalid={fieldState.invalid}
                     />
                     <InputGroupAddon align="block-end">
                       <InputGroupText className="tabular-nums">
-                        {field.value.length}/100 characters
+                        {field.value?.length ?? 0}/100 characters
                       </InputGroupText>
                     </InputGroupAddon>
                   </InputGroup>
@@ -449,7 +527,10 @@ export function ActivityForm() {
               name="venue"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+                <Field
+                  className="lg:col-span-2"
+                  data-invalid={fieldState.invalid}
+                >
                   <FieldLabel htmlFor="form-venue">Venue</FieldLabel>
                   <Input
                     {...field}
@@ -487,20 +568,25 @@ export function ActivityForm() {
           </FieldGroup>
         </form>
       </CardContent>
-      <CardFooter>
-        <Field orientation="horizontal">
-          <Button
-            id="form-reset"
-            type="button"
-            variant="outline"
-            onClick={() => form.reset()}
-          >
-            Reset
-          </Button>
-          <Button id="form-submit" type="submit" form="form-activity">
-            Submit
-          </Button>
-        </Field>
+      <CardFooter className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <Button
+          id="form-close"
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto"
+          onClick={() => navigate("/activities")}
+        >
+          Close
+        </Button>
+        <Button
+          id="form-submit"
+          type="submit"
+          form="form-activity"
+          className="w-full sm:w-auto"
+          disabled={updateActivity.isPending || createActivity.isPending}
+        >
+          Submit
+        </Button>
       </CardFooter>
     </Card>
   );

@@ -10,15 +10,107 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+// import { toast } from "sonner";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarGroup,
+  AvatarGroupCount,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 // icons
-import { CalendarDays, Wallet, MapPin, Clock7 } from "lucide-react";
+import {
+  CalendarDays,
+  Wallet,
+  MapPin,
+  Clock7,
+  EllipsisVertical,
+  TrashIcon,
+  BookHeart,
+} from "lucide-react";
+import { useNavigate } from "react-router";
+import { formatDate } from "@/lib/utils";
 
 type Props = {
   activity: Activity;
-  selectActivity: (id: string) => void;
 };
 
-export default function ActivityCard({ activity, selectActivity }: Props) {
+const attendees = [
+  { name: "Alesson", avatar: "/images/profile.jpeg", initials: "AA" },
+  {
+    name: "Juley",
+    avatar: "/images/profile.jpeg",
+    initials: "JA",
+  },
+  {
+    name: "Alyssa",
+    avatar: "/images/profile.jpeg",
+    initials: "JA",
+  },
+  { name: "Alesson", avatar: "/images/profile.jpeg", initials: "AA" },
+  {
+    name: "Juley",
+    avatar: "/images/profile.jpeg",
+    initials: "JA",
+  },
+  {
+    name: "Alyssa",
+    avatar: "/images/profile.jpeg",
+    initials: "JA",
+  },
+];
+
+function getAttendeesLabel(names: string[]) {
+  if (names.length === 0) return "No attendees yet";
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+
+  const extraCount = names.length - 2;
+  return `${names[0]}, ${names[1]} +${extraCount} ${extraCount === 1 ? "other" : "others"}`;
+}
+
+export default function ActivityCard({ activity }: Props) {
+  const navigate = useNavigate();
+  const isHost = false;
+  const isGoing = false;
+  const isCancelled = false;
+
+  const status = isCancelled
+    ? { label: "Event Cancelled", variant: "destructive" as const }
+    : isHost
+      ? { label: "You are hosting", variant: "default" as const }
+      : isGoing
+        ? { label: "You are going", variant: "success" as const }
+        : null;
+
+  const visibleAttendees = attendees.slice(0, 3);
+  const hiddenAttendeesCount = attendees.length - visibleAttendees.length;
+
   return (
     <>
       <Card className="relative mx-auto w-full max-w mb-10 pt-5">
@@ -33,11 +125,71 @@ export default function ActivityCard({ activity, selectActivity }: Props) {
             <Badge id="card-activity-type" variant="secondary">
               {activity.type}
             </Badge>
+            {status && <Badge variant={status.variant}>{status.label}</Badge>}
+            {/* Delete event menu */}
+            {isHost && (
+              <AlertDialog>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="ml-auto">
+                      <EllipsisVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent align="end">
+                    <AlertDialogTrigger asChild>
+                      <DropdownMenuItem
+                        onSelect={(e) => e.preventDefault()}
+                        className="text-destructive"
+                      >
+                        <TrashIcon />
+                        Delete
+                      </DropdownMenuItem>
+                    </AlertDialogTrigger>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete this event?</AlertDialogTitle>
+
+                    <AlertDialogDescription>
+                      This will permanently remove{" "}
+                      <strong>{activity.title}</strong>. This action cannot be
+                      undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+                    <AlertDialogAction
+                      variant="destructive"
+                      // disabled={deleteActivity.isPending}
+                      // onClick={() => {
+                      //   deleteActivity.mutate(activity.id);
+
+                      //   toast.success("Event deleted", {
+                      //     description: `"${activity.title}" has been deleted successfully.`,
+                      //     style: {
+                      //       background: "#16a34a", // green-600
+                      //       color: "#ffffff",
+                      //     },
+                      //   });
+                      // }}
+                    >
+                      <TrashIcon />
+                      Delete Event
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
           </CardAction>
           <CardTitle id="card-activity-title">{activity.title}</CardTitle>
           <CardDescription
             id="card-activity-description"
-            className="line-clamp-2"
+            className="line-clamp-2 pt-4"
           >
             {activity.description}
           </CardDescription>
@@ -48,7 +200,7 @@ export default function ActivityCard({ activity, selectActivity }: Props) {
             <div className="flex items-center gap-2">
               <CalendarDays className="h-5 w-5 text-muted-foreground" />
               <span id="card-activity-date" className="text-sm">
-                {activity.date}
+                {formatDate(activity.date)}
               </span>
             </div>
 
@@ -78,13 +230,84 @@ export default function ActivityCard({ activity, selectActivity }: Props) {
                 {activity.endTime}
               </span>
             </div>
+
+            {/* Organiser */}
+            <div className="flex items-center gap-2">
+              <BookHeart className="h-5 w-5 text-muted-foreground" />
+              <span id="card-activity-organiser" className="text-sm">
+                {`Organised by Fencing Club`}
+              </span>
+            </div>
+
+            {/* Attendees */}
+            <div className="flex min-w-0 items-center gap-2">
+              <Dialog>
+                <DialogTrigger className="min-w-0 flex-1">
+                  <Button
+                    variant="ghost"
+                    className="w-full min-w-0 justify-start gap-2 px-2"
+                  >
+                    <AvatarGroup className="shrink-0">
+                      {visibleAttendees.map((attendee) => (
+                        <Avatar key={attendee.name}>
+                          <AvatarImage
+                            src={attendee.avatar}
+                            alt={`@${attendee.name}`}
+                          />
+                          <AvatarFallback>{attendee.initials}</AvatarFallback>
+                        </Avatar>
+                      ))}
+                      {hiddenAttendeesCount > 0 && (
+                        <AvatarGroupCount>
+                          +{hiddenAttendeesCount}
+                        </AvatarGroupCount>
+                      )}
+                    </AvatarGroup>
+                    <span
+                      id="card-activity-attendee"
+                      className="min-w-0 flex-1 truncate text-left text-sm"
+                    >
+                      {`Joined by ${getAttendeesLabel(attendees.map((a) => a.name))}`}
+                    </span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="flex max-h-[85vh] flex-col">
+                  <DialogHeader>
+                    <DialogTitle>Attendee Details</DialogTitle>
+                  </DialogHeader>
+                  <div className="-mx-4 no-scrollbar min-h-0 flex-1 overflow-y-auto px-4">
+                    {attendees.map((attendee) => (
+                      <div
+                        key={attendee.name}
+                        className="flex min-w-0 items-center gap-3 py-2"
+                      >
+                        <Avatar>
+                          <AvatarImage
+                            src={attendee.avatar}
+                            alt={`@${attendee.name}`}
+                          />
+                          <AvatarFallback>{attendee.initials}</AvatarFallback>
+                        </Avatar>
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/profile/${attendee.name}`)}
+                          className="min-w-0 truncate text-left text-sm font-medium hover:underline"
+                        >
+                          {attendee.name}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </CardContent>
         <CardFooter>
           <Button
             id="card-view-event-btn"
-            className="w-full"
-            onClick={() => selectActivity(activity.id)}
+            className="w-full col-span-2"
+            onClick={() => navigate(`${activity.id}`)}
           >
             View Event
           </Button>

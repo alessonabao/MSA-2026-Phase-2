@@ -1,15 +1,20 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Outlet } from "react-router";
 import "./App.css";
-import Resources from "../../features/resources/Resources";
-import Activities from "@/features/activities/Activities";
-import Profile from "../../features/profile/Profile";
 import { ThemeProvider } from "../../components/theme-provider";
 import NavBar from "./NavBar";
+import Footer from "./Footer";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <BrowserRouter>
+      <NavBar />
+      <main>
+        <Outlet />
+      </main>
+      <Toaster />
+      <Footer />
+      {/* <BrowserRouter>
         <NavBar />
 
         <main>
@@ -19,7 +24,9 @@ export default function App() {
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </main>
-      </BrowserRouter>
+
+        <Toaster />
+      </BrowserRouter> */}
     </ThemeProvider>
   );
 }
