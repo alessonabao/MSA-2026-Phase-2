@@ -18,12 +18,16 @@ import { Input } from "@/components/ui/input";
 import { useAccount } from "@/lib/hooks/useAccount";
 import { loginSchema, type LoginSchema } from "@/lib/schemas/loginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isAxiosError } from "axios";
 import { Controller, useForm } from "react-hook-form";
-import { NavLink, useNavigate } from "react-router";
+import { NavLink, useLocation, useNavigate } from "react-router";
+import { toast } from "sonner";
 
 function LoginForm() {
   const { loginUser } = useAccount();
   const navigate = useNavigate();
+  const location = useLocation();
+
   const {
     control,
     handleSubmit,
@@ -34,8 +38,25 @@ function LoginForm() {
   });
 
   const onSubmit = async (data: LoginSchema) => {
-    await loginUser.mutateAsync(data);
-    navigate("/activities");
+    try {
+      await loginUser.mutateAsync(data, {
+        onSuccess: () => {
+          navigate(location.state?.from || "/activities");
+        },
+      });
+      toast.success("Logged in successfully");
+      navigate("/activities");
+    } catch (error) {
+      let message = "Something went wrong while logging in. Please try again.";
+      if (isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          message = "Invalid email or password.";
+        } else if (!error.response) {
+          message = "Unable to reach the server. Please check your connection.";
+        }
+      }
+      toast.error(message);
+    }
   };
 
   return (

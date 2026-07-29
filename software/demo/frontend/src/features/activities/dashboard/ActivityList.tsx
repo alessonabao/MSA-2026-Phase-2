@@ -9,13 +9,13 @@ type Props = {
 
 function ActivityList({ filters }: Props) {
   const { currentUser } = useAccount();
-  const { activities, isPending } = useActivities();
+  const { activities, isLoading } = useActivities();
 
   if (!currentUser) {
     return "You need to be logged in to view events.";
   }
 
-  if (!activities || isPending) {
+  if (!activities || isLoading) {
     return "Loading...";
   }
 
