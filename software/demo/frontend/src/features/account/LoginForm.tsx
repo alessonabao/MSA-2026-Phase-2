@@ -19,10 +19,11 @@ import { useAccount } from "@/lib/hooks/useAccount";
 import { loginSchema, type LoginSchema } from "@/lib/schemas/loginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 
 function LoginForm() {
   const { loginUser } = useAccount();
+  const navigate = useNavigate();
   const {
     control,
     handleSubmit,
@@ -34,6 +35,7 @@ function LoginForm() {
 
   const onSubmit = async (data: LoginSchema) => {
     await loginUser.mutateAsync(data);
+    navigate("/activities");
   };
 
   return (

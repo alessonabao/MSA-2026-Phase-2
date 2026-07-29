@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { Menu } from "lucide-react";
 
 import { ModeToggle } from "@/components/mode-toggle";
@@ -6,9 +6,18 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAccount } from "@/lib/hooks/useAccount";
 
 export default function NavBar() {
   const { theme } = useTheme();
+  const { currentUser, logoutUser } = useAccount();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logoutUser.mutate(undefined, {
+      onSuccess: () => navigate("/"),
+    });
+  };
 
   return (
     <header className="bg-background text-foreground border-b border-border">
@@ -55,17 +64,21 @@ export default function NavBar() {
             Resources
           </NavLink>
 
-          <NavLink
-            to="/profile"
-            id="nav-profile"
-            className={({ isActive }) =>
-              isActive
-                ? "border-b-2 border-primary pb-0.5 text-md font-semibold text-foreground"
-                : "text-md text-muted-foreground transition-colors hover:text-foreground"
-            }
-          >
-            Profile
-          </NavLink>
+          {currentUser ? (
+            <NavLink
+              to="/profile"
+              id="nav-profile"
+              className={({ isActive }) =>
+                isActive
+                  ? "border-b-2 border-primary pb-0.5 text-md font-semibold text-foreground"
+                  : "text-md text-muted-foreground transition-colors hover:text-foreground"
+              }
+            >
+              Profile
+            </NavLink>
+          ) : (
+            ""
+          )}
         </nav>
 
         {/* Right — actions */}
@@ -73,11 +86,22 @@ export default function NavBar() {
           <ModeToggle />
 
           {/* Desktop button */}
-          <NavLink to="/login">
-            <Button id="nav-login-btn" size="lg" className="hidden md:flex">
-              Login
+          {currentUser ? (
+            <Button
+              id="nav-logout-btn"
+              size="lg"
+              className="hidden md:flex"
+              onClick={handleLogout}
+            >
+              Logout
             </Button>
-          </NavLink>
+          ) : (
+            <NavLink to="/login">
+              <Button id="nav-login-btn" size="lg" className="hidden md:flex">
+                Login
+              </Button>
+            </NavLink>
+          )}
 
           {/* Mobile navigation */}
           <Sheet>
@@ -132,11 +156,21 @@ export default function NavBar() {
                   Profile
                 </NavLink>
 
-                <NavLink to="/login">
-                  <Button id="mobile-nav-login-btn" className="mt-4 w-full">
-                    Login
+                {currentUser ? (
+                  <Button
+                    id="mobile-nav-logout-btn"
+                    className="mt-4 w-full"
+                    onClick={handleLogout}
+                  >
+                    Logout
                   </Button>
-                </NavLink>
+                ) : (
+                  <NavLink to="/login">
+                    <Button id="mobile-nav-login-btn" className="mt-4 w-full">
+                      Login
+                    </Button>
+                  </NavLink>
+                )}
               </div>
             </SheetContent>
           </Sheet>

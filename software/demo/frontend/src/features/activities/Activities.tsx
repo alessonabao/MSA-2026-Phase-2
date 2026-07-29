@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import ActivitiesDashboard from "./dashboard/ActivitiesDashboard";
 import { useNavigate } from "react-router";
+import { useAccount } from "@/lib/hooks/useAccount";
 
 export default function Activities() {
   const navigate = useNavigate();
+  const { currentUser } = useAccount();
 
   return (
     <div>
@@ -14,15 +16,17 @@ export default function Activities() {
           </h1>
         </div>
 
-        <div className="flex">
-          <Button
-            id="create-event-btn"
-            className="w-full text-lg"
-            onClick={() => navigate("createActivity")}
-          >
-            Create an Event
-          </Button>
-        </div>
+        {currentUser && (
+          <div className="flex">
+            <Button
+              id="create-event-btn"
+              className="w-full text-lg"
+              onClick={() => navigate("createActivity")}
+            >
+              Create an Event
+            </Button>
+          </div>
+        )}
       </div>
 
       <ActivitiesDashboard />

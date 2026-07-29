@@ -1,5 +1,6 @@
 import ActivityCard from "./ActivityCard";
 import { useActivities } from "@/lib/hooks/useActivities";
+import { useAccount } from "@/lib/hooks/useAccount";
 import { filterActivities, type ActivityFilters } from "./ActivityFilters";
 
 type Props = {
@@ -7,7 +8,12 @@ type Props = {
 };
 
 function ActivityList({ filters }: Props) {
+  const { currentUser } = useAccount();
   const { activities, isPending } = useActivities();
+
+  if (!currentUser) {
+    return "You need to be logged in to view events.";
+  }
 
   if (!activities || isPending) {
     return "Loading...";

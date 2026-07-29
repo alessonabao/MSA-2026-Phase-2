@@ -19,3 +19,10 @@ export interface Activity {
   longitude: number;
   price: number;
 }
+
+export type User = {
+  id: string;
+  email: string;
+  profileName: string;
+  imageUrl?: string;
+};
