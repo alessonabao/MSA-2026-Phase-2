@@ -73,9 +73,11 @@ export default function NavBar() {
           <ModeToggle />
 
           {/* Desktop button */}
-          <Button id="nav-login-btn" size="lg" className="hidden md:flex">
-            Login
-          </Button>
+          <NavLink to="/login">
+            <Button id="nav-login-btn" size="lg" className="hidden md:flex">
+              Login
+            </Button>
+          </NavLink>
 
           {/* Mobile navigation */}
           <Sheet>
@@ -130,9 +132,11 @@ export default function NavBar() {
                   Profile
                 </NavLink>
 
-                <Button id="mobile-nav-login-btn" className="mt-4 w-full">
-                  Login
-                </Button>
+                <NavLink to="/login">
+                  <Button id="mobile-nav-login-btn" className="mt-4 w-full">
+                    Login
+                  </Button>
+                </NavLink>
               </div>
             </SheetContent>
           </Sheet>

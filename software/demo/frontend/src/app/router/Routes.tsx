@@ -7,6 +7,7 @@ import Activities from "@/features/activities/Activities";
 import Profile from "@/features/profile/Profile";
 import Resources from "@/features/resources/Resources";
 import ActivityDetailsPage from "@/features/activities/details/ActivityDetailsPage";
+import LoginForm from "@/features/account/LoginForm";
 
 export const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ export const router = createBrowserRouter([
       { path: "manage/:id", element: <ActivityForm /> },
       { path: "resources", element: <Resources /> },
       { path: "profile", element: <Profile /> },
+      { path: "login", element: <LoginForm /> },
     ],
   },
 ]);

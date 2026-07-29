@@ -6,8 +6,9 @@ software/demo/backend/**/bin/
 software/demo/backend/**/obj/
 
 # Node
-frontend/node_modules/
-frontend/dist/
+software/demo/frontend/node_modules/
+software/demo/frontend/dist/
+software/demo/frontend/dist-ssr/
 
 # Environment
 .env
@@ -52,8 +53,8 @@ dist-ssr
 *.sw?
 
 # Playwright
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-/playwright/.auth/
+software/demo/frontend/test-results/
+software/demo/frontend/playwright-report/
+software/demo/frontend/blob-report/
+software/demo/frontend/playwright/.cache/
+software/demo/frontend/playwright/.auth/
