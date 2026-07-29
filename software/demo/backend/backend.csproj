@@ -6,6 +6,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- backend.Tests lives inside this project's folder as its own separate SDK project, so
+       exclude it here - otherwise the default recursive glob below would also compile its
+       files (and its test-only package references) into this app. -->
+  <ItemGroup>
+    <Compile Remove="backend.Tests/**" />
+    <Content Remove="backend.Tests/**" />
+    <EmbeddedResource Remove="backend.Tests/**" />
+    <None Remove="backend.Tests/**" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="MediatR" Version="12.4.1" />
