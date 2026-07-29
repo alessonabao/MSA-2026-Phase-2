@@ -16,41 +16,37 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useAccount } from "@/lib/hooks/useAccount";
-import { loginSchema, type LoginSchema } from "@/lib/schemas/loginSchema";
+import {
+  registerSchema,
+  type RegisterSchema,
+} from "@/lib/schemas/registerSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isAxiosError } from "axios";
 import { Controller, useForm } from "react-hook-form";
-import { NavLink, useLocation, useNavigate } from "react-router";
+import { NavLink } from "react-router";
 import { toast } from "sonner";
 
-function LoginForm() {
-  const { loginUser } = useAccount();
-  const navigate = useNavigate();
-  const location = useLocation();
+function RegisterForm() {
+  const { registerUser } = useAccount();
 
   const {
     control,
     handleSubmit,
     formState: { isValid, isSubmitting },
-  } = useForm<LoginSchema>({
+  } = useForm<RegisterSchema>({
     mode: "onTouched",
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = async (data: LoginSchema) => {
+  const onSubmit = async (data: RegisterSchema) => {
     try {
-      await loginUser.mutateAsync(data, {
-        onSuccess: () => {
-          navigate(location.state?.from || "/activities");
-        },
-      });
-      toast.success("Logged in successfully");
-      navigate("/activities");
+      await registerUser.mutateAsync(data);
     } catch (error) {
-      let message = "Something went wrong while logging in. Please try again.";
+      let message =
+        "Something went wrong while creating your account. Please try again.";
       if (isAxiosError(error)) {
-        if (error.response?.status === 401) {
-          message = "Invalid email or password.";
+        if (error.response?.status === 400) {
+          message = "That email is already registered.";
         } else if (!error.response) {
           message = "Unable to reach the server. Please check your connection.";
         }
@@ -63,14 +59,39 @@ function LoginForm() {
     <>
       <Card className="mx-auto w-full max-w-5xl">
         <CardHeader className="pb-6">
-          <CardTitle className="text-3xl font-bold">Login</CardTitle>
+          <CardTitle className="text-3xl font-bold">Create Account</CardTitle>
           <CardDescription>
-            Enter your credentials to access club events and beginner resources.
+            Join Auckland&apos;s fencing community.
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">
-          <form id="form-activity" onSubmit={handleSubmit(onSubmit)}>
+          <form id="form-register" onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {/* Full Name */}
+              <Controller
+                name="profileName"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    className="lg:col-span-2"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <FieldLabel htmlFor="register-profile-name">
+                      Full Name
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="register-profile-name"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="e.g. Portia Knight"
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
               {/* Email */}
               <Controller
                 name="email"
@@ -80,12 +101,14 @@ function LoginForm() {
                     className="lg:col-span-2"
                     data-invalid={fieldState.invalid}
                   >
-                    <FieldLabel htmlFor="login-email">Email</FieldLabel>
+                    <FieldLabel htmlFor="register-email">
+                      Email Address
+                    </FieldLabel>
                     <Input
                       {...field}
-                      id="login-email"
+                      id="register-email"
                       aria-invalid={fieldState.invalid}
-                      placeholder="Email"
+                      placeholder="upi@aucklanduni.ac.nz"
                       autoComplete="off"
                     />
                     {fieldState.invalid && (
@@ -99,14 +122,36 @@ function LoginForm() {
                 name="password"
                 control={control}
                 render={({ field, fieldState }) => (
-                  <Field
-                    className="lg:col-span-2"
-                    data-invalid={fieldState.invalid}
-                  >
-                    <FieldLabel htmlFor="login-password">Password</FieldLabel>
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="register-password">
+                      Password
+                    </FieldLabel>
                     <Input
                       {...field}
-                      id="login-password"
+                      id="register-password"
+                      type="password"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Password"
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              {/* Confirm Password */}
+              <Controller
+                name="confirmPassword"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="register-confirm-password">
+                      Confirm Password
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="register-confirm-password"
                       type="password"
                       aria-invalid={fieldState.invalid}
                       placeholder="Password"
@@ -120,12 +165,14 @@ function LoginForm() {
               />
               <FieldSeparator className="lg:col-span-2" />
               <div className="flex flex-col gap-1 text-sm sm:flex-row sm:gap-1.5 lg:col-span-2">
-                <p className="text-muted-foreground">Not a member yet?</p>
+                <p className="text-muted-foreground">
+                  Already have an account?
+                </p>
                 <NavLink
-                  to="/register"
+                  to="/login"
                   className="font-medium text-primary underline underline-offset-4 hover:text-primary/80"
                 >
-                  Sign Up
+                  Log in
                 </NavLink>
               </div>
             </FieldGroup>
@@ -136,14 +183,14 @@ function LoginForm() {
             id="form-submit"
             type="submit"
             disabled={!isValid || isSubmitting}
-            form="form-activity"
+            form="form-register"
             className="w-full"
           >
-            Login
+            Create Account
           </Button>
         </CardFooter>
       </Card>
     </>
   );
 }
-export default LoginForm;
+export default RegisterForm;

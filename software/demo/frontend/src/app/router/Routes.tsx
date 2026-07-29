@@ -9,6 +9,7 @@ import Resources from "@/features/resources/Resources";
 import ActivityDetailsPage from "@/features/activities/details/ActivityDetailsPage";
 import LoginForm from "@/features/account/LoginForm";
 import RequireAuth from "./RequireAuth";
+import RegisterForm from "@/features/account/RegisterForm";
 
 export const router = createBrowserRouter([
   {
@@ -37,6 +38,7 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: "resources", element: <Resources /> },
       { path: "login", element: <LoginForm /> },
+      { path: "register", element: <RegisterForm /> },
     ],
   },
 ]);
