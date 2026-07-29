@@ -13,7 +13,7 @@ on:
       - main
       - develop
     paths:
-      - "backend/**"
+      - "software/demo/backend/**"
       - ".github/workflows/backend-ci.yml"
       - ".github/workflows/reusable-ci.yml"
 
@@ -22,7 +22,7 @@ on:
       - main
       - develop
     paths:
-      - "backend/**"
+      - "software/demo/backend/**"
       - ".github/workflows/backend-ci.yml"
       - ".github/workflows/reusable-ci.yml"
 
@@ -30,19 +30,26 @@ jobs:
   backend:
     uses: ./.github/workflows/reusable-ci.yml
     with:
-      # Tells the reusable workflow to run frontend steps
+      # Tells the reusable workflow to run backend steps
       project-type: backend
 
-      # Backend project folder
+      # Backend project folder. Contains backend.sln, which ties
+      # together backend.csproj (the app) and backend.Tests.csproj
+      # (its xUnit test project) so a single restore/build/test
+      # command covers both.
       working-directory: software/demo/backend
 
       # Must match TargetFramework net10.0 in backend.csproj
       dotnet-version: "10.0.x"
 
-      # Build in Release mode; --no-restore skips a redundant
-      # restore since the reusable workflow runs dotnet restore first
-      build-command: dotnet build --no-restore --configuration Release
+      # Explicitly target backend.sln: the working directory now has
+      # both backend.csproj and backend.sln, so a bare `dotnet build`
+      # would fail with "more than one project or solution file".
+      # --no-restore skips a redundant restore since the reusable
+      # workflow runs dotnet restore first.
+      build-command: dotnet build backend.sln --no-restore --configuration Release
 
-      # Run all tests; --no-build skips recompiling since
-      # the build step above already compiled the project
-      # test-command: dotnet test --no-build --verbosity normal
+      # Run the backend.Tests project via the solution.
+      # --no-build skips recompiling since the build step above
+      # already compiled everything.
+      test-command: dotnet test backend.sln --no-build --configuration Release
