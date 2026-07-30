@@ -1,4 +1,5 @@
 using System;
+using backend.Activities;
 using backend.Activities.Commands;
 using backend.Activities.Queries;
 using backend.Models;
@@ -19,6 +20,26 @@ public class ActivitiesController() : BaseApiController
           public async Task<ActionResult<ClubActivity>> GetEventDetail(string id)
           {
                     return await Mediator.Send(new GetActivityDetails.Query{Id = id});
+          }
+
+          [HttpGet("{id}/attendance")]
+          public async Task<ActionResult<AttendanceStatusDto>> GetAttendanceStatus(string id)
+          {
+                    return await Mediator.Send(new GetActivityAttendance.Query { ActivityId = id, UserId = CurrentUserId });
+          }
+
+          [Authorize(Roles = Roles.Member)]
+          [HttpPost("{id}/join")]
+          public async Task<ActionResult<AttendanceStatusDto>> JoinEvent(string id)
+          {
+                    return await Mediator.Send(new JoinActivity.Command { ActivityId = id, UserId = CurrentUserId });
+          }
+
+          [Authorize(Roles = Roles.Member)]
+          [HttpPost("{id}/cancel-attendance")]
+          public async Task<ActionResult<AttendanceStatusDto>> CancelAttendance(string id)
+          {
+                    return await Mediator.Send(new CancelAttendance.Command { ActivityId = id, UserId = CurrentUserId });
           }
 
           [Authorize(Roles = Roles.ClubAdmin)]

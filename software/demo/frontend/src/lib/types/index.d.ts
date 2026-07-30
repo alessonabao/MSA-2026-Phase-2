@@ -29,6 +29,10 @@ export type User = {
   role: Role;
 };
 
+export type AttendanceStatus = {
+  isGoing: boolean;
+};
+
 export type Badge = {
   id: string;
   code: string;

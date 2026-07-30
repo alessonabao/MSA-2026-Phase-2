@@ -8,6 +8,7 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(op
 {
     public required DbSet<ClubActivity> ClubActivities { get; set; }
     public required DbSet<UserBadge> UserBadges { get; set; }
+    public required DbSet<ActivityAttendance> ActivityAttendances { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -15,6 +16,10 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(op
 
         builder.Entity<UserBadge>()
             .HasIndex(b => new { b.UserId, b.Code })
+            .IsUnique();
+
+        builder.Entity<ActivityAttendance>()
+            .HasIndex(a => new { a.ActivityId, a.UserId })
             .IsUnique();
     }
 }

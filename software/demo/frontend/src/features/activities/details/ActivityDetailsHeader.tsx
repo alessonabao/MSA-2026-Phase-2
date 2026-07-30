@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -6,13 +7,19 @@ import { useActivities } from "@/lib/hooks/useActivities";
 import { Link, useParams } from "react-router";
 
 export default function ActivityDetailsHeader() {
-  const isCancelled = false;
-  const isGoing = true;
-  const loading = false;
   const { id } = useParams();
   const { currentUser } = useAccount();
-  const { activity, isLoadingActivity } = useActivities(id);
+  const {
+    activity,
+    isLoadingActivity,
+    attendance,
+    joinActivity,
+    cancelAttendance,
+  } = useActivities(id);
   const isHost = currentUser?.role === "ClubAdmin";
+  const isCancelled = activity?.isCancelled ?? false;
+  const isGoing = attendance?.isGoing ?? false;
+  const loading = joinActivity.isPending || cancelAttendance.isPending;
 
   if (isLoadingActivity) {
     return null;
@@ -21,6 +28,21 @@ export default function ActivityDetailsHeader() {
   if (!activity) {
     return null;
   }
+
+  const handleToggleAttendance = () => {
+    if (!id) return;
+
+    const action = isGoing ? cancelAttendance : joinActivity;
+    action.mutate(id, {
+      onError: () => {
+        toast.error(
+          isGoing
+            ? "Couldn't cancel your attendance. Please try again."
+            : "Couldn't join the event. Please try again.",
+        );
+      },
+    });
+  };
 
   return (
     <>
@@ -75,6 +97,7 @@ export default function ActivityDetailsHeader() {
               <Button
                 variant={isGoing ? "secondary" : "success"}
                 disabled={isCancelled || loading}
+                onClick={handleToggleAttendance}
               >
                 {isGoing ? "Cancel Attendance" : "Join Event"}
               </Button>
