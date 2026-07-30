@@ -1,16 +1,18 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useAccount } from "@/lib/hooks/useAccount";
 import { useActivities } from "@/lib/hooks/useActivities";
 import { Link, useParams } from "react-router";
 
 export default function ActivityDetailsHeader() {
   const isCancelled = false;
-  const isHost = true;
   const isGoing = true;
   const loading = false;
   const { id } = useParams();
+  const { currentUser } = useAccount();
   const { activity, isLoadingActivity } = useActivities(id);
+  const isHost = currentUser?.role === "ClubAdmin";
 
   if (isLoadingActivity) {
     return null;

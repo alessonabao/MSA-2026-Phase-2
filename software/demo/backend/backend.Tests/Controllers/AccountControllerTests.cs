@@ -40,10 +40,13 @@ public class AccountControllerTests
     [Fact]
     public async Task RegisterUser_ReturnsOk_WhenCreationSucceeds()
     {
-        // Arrange: build the objects the test needs before doing anything (e.g. a controller whose mocked UserManager is stubbed to report a successful user creation).
+        // Arrange: build the objects the test needs before doing anything (e.g. a controller whose mocked UserManager is stubbed to report a successful user creation and role assignment).
         var (controller, userManager, _) = CreateController();
         userManager
             .Setup(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
+            .ReturnsAsync(IdentityResult.Success);
+        userManager
+            .Setup(x => x.AddToRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
             .ReturnsAsync(IdentityResult.Success);
 
         // Act: perform the single operation being tested (e.g. calling RegisterUser with a valid registration request).
@@ -54,8 +57,9 @@ public class AccountControllerTests
             Password = "EnGarde!2"
         });
 
-        // Assert: check the outcome matches what was expected (e.g. the action returned a plain 200 OK result).
+        // Assert: check the outcome matches what was expected (e.g. the action returned a plain 200 OK result, and the new user was assigned the default Member role).
         Assert.IsType<OkResult>(result);
+        userManager.Verify(x => x.AddToRoleAsync(It.IsAny<User>(), Roles.Member), Times.Once);
     }
 
     /// <summary>Verifies that a failed <c>UserManager.CreateAsync</c> (e.g. duplicate email) surfaces as a 400 validation problem.</summary>
@@ -149,6 +153,9 @@ public class AccountControllerTests
         userManager
             .Setup(x => x.GetUserAsync(It.IsAny<ClaimsPrincipal>()))
             .ReturnsAsync(user);
+        userManager
+            .Setup(x => x.GetRolesAsync(user))
+            .ReturnsAsync([Roles.Member]);
 
         // Act: perform the single operation being tested (e.g. calling GetUserInfo).
         var result = await controller.GetUserInfo();

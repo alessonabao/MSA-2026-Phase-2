@@ -16,7 +16,7 @@ export default function Activities() {
           </h1>
         </div>
 
-        {currentUser && (
+        {currentUser?.role === "ClubAdmin" && (
           <div className="flex">
             <Button
               id="create-event-btn"

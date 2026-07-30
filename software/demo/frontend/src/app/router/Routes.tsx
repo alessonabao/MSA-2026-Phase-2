@@ -9,6 +9,7 @@ import Resources from "@/features/resources/Resources";
 import ActivityDetailsPage from "@/features/activities/details/ActivityDetailsPage";
 import LoginForm from "@/features/account/LoginForm";
 import RequireAuth from "./RequireAuth";
+import RequireRole from "./RequireRole";
 import RegisterForm from "@/features/account/RegisterForm";
 
 export const router = createBrowserRouter([
@@ -24,14 +25,22 @@ export const router = createBrowserRouter([
             path: "activities",
             children: [
               { index: true, element: <Activities /> },
-              {
-                path: "createActivity",
-                element: <ActivityForm key="create" />,
-              },
               { path: ":id", element: <ActivityDetailsPage /> },
+              {
+                element: <RequireRole allow={["ClubAdmin"]} />,
+                children: [
+                  {
+                    path: "createActivity",
+                    element: <ActivityForm key="create" />,
+                  },
+                ],
+              },
             ],
           },
-          { path: "manage/:id", element: <ActivityForm /> },
+          {
+            element: <RequireRole allow={["ClubAdmin"]} />,
+            children: [{ path: "manage/:id", element: <ActivityForm /> }],
+          },
           { path: "profile", element: <Profile /> },
         ],
       },

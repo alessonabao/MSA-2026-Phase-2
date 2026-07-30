@@ -3,13 +3,29 @@ using backend.Core;
 using backend.data;
 using backend.Data;
 using backend.Models;
+using backend.Profiles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Scalar.AspNetCore;
 
+// The Web SDK requires wwwroot to physically exist before CreateBuilder runs, even though
+// nothing is served from it (uploads live outside the project - see below). Git doesn't track
+// empty directories, so a fresh clone wouldn't have it without this. `dotnet run`/`dotnet watch`
+// set the working directory to the project folder, so a plain relative path is enough.
+Directory.CreateDirectory("wwwroot");
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Uploaded files live one level above the project folder, not under wwwroot - deliberately
+// outside the directory tree `dotnet watch` scopes its file watcher to, since a runtime-written
+// file appearing inside that tree crashes its Hot Reload workspace sync.
+var uploadsRoot = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "uploads"));
+var profilePicturesDir = Path.Combine(uploadsRoot, "profile-pictures");
+Directory.CreateDirectory(profilePicturesDir);
+builder.Services.AddSingleton(new UploadPaths { ProfilePicturesDirectory = profilePicturesDir });
 
 builder.Services.AddControllers(opt =>
 {
@@ -50,7 +66,11 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 
-app.UseHttpsRedirection();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsRoot),
+    RequestPath = "/uploads"
+});
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -71,12 +91,13 @@ try
           // give access to db context to query to db
           var context = services.GetRequiredService<AppDbContext>();
           var userManager = services.GetRequiredService<UserManager<User>>();
+          var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
           // creates a database when there's no db or apply pending migrations
           await context.Database.MigrateAsync();
 
           // seed data in db
-          await DbSeedData.SeedData(context, userManager);
+          await DbSeedData.SeedData(context, userManager, roleManager);
 }
 catch(Exception ex)
 {

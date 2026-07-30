@@ -22,8 +22,14 @@ public class AccountController(SignInManager<User> signInManager) : BaseApiContr
 
                     var result = await signInManager.UserManager.CreateAsync(user, registerUser.Password);
 
-                    if(result.Succeeded) return Ok();
-                    
+                    if(result.Succeeded)
+                    {
+                              // public registration always creates regular club members - ClubAdmin
+                              // accounts are provisioned separately (seed data / DB), never self-serve
+                              await signInManager.UserManager.AddToRoleAsync(user, Roles.Member);
+                              return Ok();
+                    }
+
                     foreach(var error in result.Errors)
                     {
                               ModelState.AddModelError(error.Code, error.Description);
@@ -42,12 +48,15 @@ public class AccountController(SignInManager<User> signInManager) : BaseApiContr
 
                     if(user == null) return Unauthorized();
 
+                    var roles = await signInManager.UserManager.GetRolesAsync(user);
+
                     return Ok(new
                     {
                               user.ProfileName,
                               user.Email,
                               user.Id,
-                              user.ProfileImageUrl
+                              user.ProfileImageUrl,
+                              Role = roles.FirstOrDefault() ?? Roles.Member
                     });
           }
 

@@ -8,21 +8,48 @@ namespace backend.data;
 
 public class DbSeedData
 {
-          public static async Task SeedData(AppDbContext context, UserManager<User> userManager)
+          public static async Task SeedData(AppDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
           {
-                    // check if you have users
-                    if (!userManager.Users.Any())
+                    // ensure the two app roles exist before anything tries to assign them
+                    foreach (var role in new[] { Roles.Member, Roles.ClubAdmin })
                     {
-                              var users = new List<User>
+                              if (!await roleManager.RoleExistsAsync(role))
                               {
-                                        new() {ProfileName = "Alesson", UserName = "alesson@test.com", Email = "alesson@test.com"},
-                                        new() {ProfileName = "Fencing Club", UserName = "fencingclub@test.com", Email = "fencingclub@test.com"}
+                                        await roleManager.CreateAsync(new IdentityRole(role));
+                              }
+                    }
 
-                              };
+                    // seed users - looked up per-account (rather than bailing out if *any* user
+                    // exists) so that a database created before roles existed gets its role
+                    // assignments backfilled on the next run instead of being skipped forever.
+                    var seedUsers = new List<(User User, string Password, string Role)>
+                    {
+                              (
+                                        new() { ProfileName = "Alesson", UserName = "alesson@test.com", Email = "alesson@test.com" },
+                                        "EnGarde!2",
+                                        Roles.Member
+                              ),
+                              (
+                                        new()
+                                        {
+                                                  ProfileName = "Fencing Club",
+                                                  UserName = "fencingclub@test.com",
+                                                  Email = "fencingclub@test.com",
+                                                  ProfileBio = "Official account for En Garde Auckland club announcements and administration.",
+                                                  ContactInfo = "Email: fencingclub@test.com\nPhone: 09 555 0199\nFor bookings, membership, and general enquiries, reach out any time."
+                                        },
+                                        "EnGarde!2",
+                                        Roles.ClubAdmin
+                              )
+                    };
 
-                              foreach(var user in users)
+                    foreach (var (seedUser, password, role) in seedUsers)
+                    {
+                              var user = await userManager.FindByEmailAsync(seedUser.Email!);
+
+                              if (user == null)
                               {
-                                        var result = await userManager.CreateAsync(user, "EnGarde!2");
+                                        var result = await userManager.CreateAsync(seedUser, password);
 
                                         // CreateAsync doesn't throw on a rejected password (e.g. fails
                                         // Identity's strength rules) - it just returns Succeeded = false,
@@ -30,8 +57,15 @@ public class DbSeedData
                                         if (!result.Succeeded)
                                         {
                                                   var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                                                  throw new InvalidOperationException($"Failed to seed user '{user.Email}': {errors}");
+                                                  throw new InvalidOperationException($"Failed to seed user '{seedUser.Email}': {errors}");
                                         }
+
+                                        user = seedUser;
+                              }
+
+                              if (!await userManager.IsInRoleAsync(user, role))
+                              {
+                                        await userManager.AddToRoleAsync(user, role);
                               }
                     }
 

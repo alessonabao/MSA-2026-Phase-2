@@ -27,7 +27,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-// import { toast } from "sonner";
+import { toast } from "sonner";
 import {
   Avatar,
   AvatarFallback,
@@ -55,6 +55,8 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { formatDate } from "@/lib/utils";
+import { useAccount } from "@/lib/hooks/useAccount";
+import { useActivities } from "@/lib/hooks/useActivities";
 
 type Props = {
   activity: Activity;
@@ -96,7 +98,9 @@ function getAttendeesLabel(names: string[]) {
 
 export default function ActivityCard({ activity }: Props) {
   const navigate = useNavigate();
-  const isHost = false;
+  const { currentUser } = useAccount();
+  const { deleteActivity } = useActivities();
+  const isHost = currentUser?.role === "ClubAdmin";
   const isGoing = false;
   const isCancelled = false;
 
@@ -165,18 +169,21 @@ export default function ActivityCard({ activity }: Props) {
 
                     <AlertDialogAction
                       variant="destructive"
-                      // disabled={deleteActivity.isPending}
-                      // onClick={() => {
-                      //   deleteActivity.mutate(activity.id);
-
-                      //   toast.success("Event deleted", {
-                      //     description: `"${activity.title}" has been deleted successfully.`,
-                      //     style: {
-                      //       background: "#16a34a", // green-600
-                      //       color: "#ffffff",
-                      //     },
-                      //   });
-                      // }}
+                      disabled={deleteActivity.isPending}
+                      onClick={() => {
+                        deleteActivity.mutate(activity.id, {
+                          onSuccess: () => {
+                            toast.success("Event deleted", {
+                              description: `"${activity.title}" has been deleted successfully.`,
+                            });
+                          },
+                          onError: () => {
+                            toast.error("Failed to delete event", {
+                              description: "Please try again.",
+                            });
+                          },
+                        });
+                      }}
                     >
                       <TrashIcon />
                       Delete Event

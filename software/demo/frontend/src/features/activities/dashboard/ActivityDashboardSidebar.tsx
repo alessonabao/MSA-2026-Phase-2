@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
+import { useAccount } from "@/lib/hooks/useAccount";
 import type { Activity, Weapon, SkillLevel } from "@/lib/types";
 import {
   DEFAULT_ACTIVITY_FILTERS,
@@ -19,7 +20,7 @@ import {
 const PARTICIPATION_OPTIONS: { value: ParticipationFilter; label: string }[] = [
   { value: "all", label: "All Events" },
   { value: "going", label: "Going" },
-  { value: "hosting", label: "Hosting" },
+  { value: "notGoing", label: "Not Going" },
 ];
 
 type Props = {
@@ -41,6 +42,9 @@ function ActivityDashboardSidebar({
   onFiltersChange,
   activities,
 }: Props) {
+  const { currentUser } = useAccount();
+  const isClubAdmin = currentUser?.role === "ClubAdmin";
+
   const toggleEventType = (eventType: (typeof EVENT_TYPE_OPTIONS)[number]) => {
     const isSelected = filters.eventTypes.includes(eventType);
     onFiltersChange({
@@ -67,24 +71,26 @@ function ActivityDashboardSidebar({
   return (
     <Card>
       <CardContent className="flex flex-col gap-6">
-        {/* Participation */}
-        <div className="flex flex-col gap-3">
-          <SectionLabel>Participation</SectionLabel>
-          {PARTICIPATION_OPTIONS.map((option) => (
-            <div key={option.value} className="flex items-center gap-2">
-              <Checkbox
-                id={`participation-${option.value}`}
-                checked={filters.participation === option.value}
-                onCheckedChange={() =>
-                  onFiltersChange({ ...filters, participation: option.value })
-                }
-              />
-              <Label htmlFor={`participation-${option.value}`}>
-                {option.label}
-              </Label>
-            </div>
-          ))}
-        </div>
+        {/* Participation (not meaningful for a Club Admin, who manages every event rather than attending as a member) */}
+        {!isClubAdmin && (
+          <div className="flex flex-col gap-3">
+            <SectionLabel>Participation</SectionLabel>
+            {PARTICIPATION_OPTIONS.map((option) => (
+              <div key={option.value} className="flex items-center gap-2">
+                <Checkbox
+                  id={`participation-${option.value}`}
+                  checked={filters.participation === option.value}
+                  onCheckedChange={() =>
+                    onFiltersChange({ ...filters, participation: option.value })
+                  }
+                />
+                <Label htmlFor={`participation-${option.value}`}>
+                  {option.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Weapon Type */}
         <div className="flex flex-col gap-3 @container/weapon-toggle">

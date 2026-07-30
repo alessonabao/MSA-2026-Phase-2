@@ -2,7 +2,7 @@ import { isWithinInterval, parseISO, startOfDay, endOfDay } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import type { Activity, ActivityType, SkillLevel, Weapon } from "@/lib/types";
 
-export type ParticipationFilter = "all" | "going" | "hosting";
+export type ParticipationFilter = "all" | "going" | "notGoing";
 
 export interface ActivityFilters {
   participation: ParticipationFilter;

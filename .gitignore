@@ -5,6 +5,10 @@
 software/demo/backend/**/bin/
 software/demo/backend/**/obj/
 
+# User-uploaded profile pictures - runtime content, not source. Lives outside backend/ itself
+# (see Program.cs) so `dotnet watch`'s file watcher never sees it in the first place.
+software/demo/uploads/
+
 # Node
 software/demo/frontend/node_modules/
 software/demo/frontend/dist/
