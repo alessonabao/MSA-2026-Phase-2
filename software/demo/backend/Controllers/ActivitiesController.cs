@@ -28,6 +28,27 @@ public class ActivitiesController() : BaseApiController
                     return await Mediator.Send(new GetActivityAttendance.Query { ActivityId = id, UserId = CurrentUserId });
           }
 
+          [HttpGet("{id}/attendees")]
+          public async Task<ActionResult<List<AttendeeDto>>> GetAttendees(string id)
+          {
+                    return await Mediator.Send(new GetActivityAttendees.Query { ActivityId = id });
+          }
+
+          [HttpGet("mine")]
+          public async Task<ActionResult<List<AttendedActivityDto>>> GetMyAttendedActivities()
+          {
+                    return await Mediator.Send(new GetMyAttendedActivities.Query { UserId = CurrentUserId });
+          }
+
+          // Unlike "mine" above, this isn't restricted to the caller's own id - a
+          // profile's event timeline is public to any authenticated viewer, same as
+          // GET /profile/{id}.
+          [HttpGet("attendance/{userId}")]
+          public async Task<ActionResult<List<AttendedActivityDto>>> GetAttendedActivities(string userId)
+          {
+                    return await Mediator.Send(new GetMyAttendedActivities.Query { UserId = userId });
+          }
+
           [Authorize(Roles = Roles.Member)]
           [HttpPost("{id}/join")]
           public async Task<ActionResult<AttendanceStatusDto>> JoinEvent(string id)
