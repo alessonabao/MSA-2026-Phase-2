@@ -47,8 +47,22 @@ export function getInitialCalendarMonth(activities: Activity[]): Date {
 export function filterActivities(
   activities: Activity[],
   filters: ActivityFilters,
+  // Activity ids the current user is actively attending - a cancelled
+  // ActivityAttendance is deliberately excluded from this set, so it is
+  // treated as "not going" here, not just in how it's labeled in the UI.
+  goingActivityIds: Set<string>,
 ): Activity[] {
   return activities.filter((activity) => {
+    if (
+      filters.participation === "going" &&
+      !goingActivityIds.has(activity.id)
+    )
+      return false;
+    if (
+      filters.participation === "notGoing" &&
+      goingActivityIds.has(activity.id)
+    )
+      return false;
     if (
       filters.weapons.length > 0 &&
       !filters.weapons.includes(activity.weapon)
