@@ -157,6 +157,12 @@ export const useActivities = (id?: string) => {
     },
     onSuccess: async (data, activityId) => {
       queryClient.setQueryData(["activities", activityId, "attendance"], data);
+      // Joining/cancelling writes a new ActivityAttendance row, which also backs
+      // the attendee list, the "mine"/participation-filter query, and profile
+      // timelines - invalidate the whole activities cache tree (same pattern
+      // createActivity/updateActivity/deleteActivity already use above) so all
+      // of those refetch now instead of only on next mount.
+      await queryClient.invalidateQueries({ queryKey: ["activities"] });
       // joining can cross a badge threshold (1st/5th/10th event) - refresh the
       // profile so newly-earned badges show up without a manual reload.
       await queryClient.invalidateQueries({ queryKey: ["profile"] });
@@ -172,6 +178,7 @@ export const useActivities = (id?: string) => {
     },
     onSuccess: async (data, activityId) => {
       queryClient.setQueryData(["activities", activityId, "attendance"], data);
+      await queryClient.invalidateQueries({ queryKey: ["activities"] });
       await queryClient.invalidateQueries({ queryKey: ["profile"] });
     },
   });
