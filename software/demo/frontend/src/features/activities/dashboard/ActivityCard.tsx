@@ -35,13 +35,6 @@ import {
   AvatarGroupCount,
   AvatarImage,
 } from "@/components/ui/avatar";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 // icons
 import {
@@ -54,41 +47,21 @@ import {
   BookHeart,
 } from "lucide-react";
 import { useNavigate } from "react-router";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getInitials } from "@/lib/utils";
 import { useAccount } from "@/lib/hooks/useAccount";
-import { useActivities } from "@/lib/hooks/useActivities";
+import {
+  useActivities,
+  useActivityAttendees,
+  useMyAttendedActivities,
+} from "@/lib/hooks/useActivities";
+import AttendeeList from "../AttendeeList";
 
 type Props = {
   activity: Activity;
 };
 
-const attendees = [
-  { name: "Alesson", avatar: "/images/profile.jpeg", initials: "AA" },
-  {
-    name: "Juley",
-    avatar: "/images/profile.jpeg",
-    initials: "JA",
-  },
-  {
-    name: "Alyssa",
-    avatar: "/images/profile.jpeg",
-    initials: "JA",
-  },
-  { name: "Alesson", avatar: "/images/profile.jpeg", initials: "AA" },
-  {
-    name: "Juley",
-    avatar: "/images/profile.jpeg",
-    initials: "JA",
-  },
-  {
-    name: "Alyssa",
-    avatar: "/images/profile.jpeg",
-    initials: "JA",
-  },
-];
-
 function getAttendeesLabel(names: string[]) {
-  if (names.length === 0) return "No attendees yet";
+  if (names.length === 0) return "no one";
   if (names.length === 1) return names[0];
   if (names.length === 2) return `${names[0]} and ${names[1]}`;
 
@@ -100,17 +73,27 @@ export default function ActivityCard({ activity }: Props) {
   const navigate = useNavigate();
   const { currentUser } = useAccount();
   const { deleteActivity } = useActivities();
+  const { attendees } = useActivityAttendees(activity.id);
+  const { myAttendedActivities } = useMyAttendedActivities();
   const isHost = currentUser?.role === "ClubAdmin";
-  const isGoing = false;
-  const isCancelled = false;
+  const myAttendance = myAttendedActivities.find(
+    (a) => a.activity.id === activity.id,
+  );
+  const isGoing = !!myAttendance && !myAttendance.isCancelled;
+  const isCancelled = !!myAttendance?.isCancelled;
 
-  const status = isCancelled
+  // Priority: the event itself being cancelled by an admin outranks the
+  // current user's own attendance relationship, which in turn outranks
+  // "you are hosting" (a ClubAdmin has no ActivityAttendance row of their own).
+  const status = activity.isCancelled
     ? { label: "Event Cancelled", variant: "destructive" as const }
-    : isHost
-      ? { label: "You are hosting", variant: "default" as const }
-      : isGoing
-        ? { label: "You are going", variant: "success" as const }
-        : null;
+    : isCancelled
+      ? { label: "Cancelled", variant: "destructive" as const }
+      : isHost
+        ? { label: "You are hosting", variant: "default" as const }
+        : isGoing
+          ? { label: "Attending", variant: "success" as const }
+          : null;
 
   const visibleAttendees = attendees.slice(0, 3);
   const hiddenAttendeesCount = attendees.length - visibleAttendees.length;
@@ -248,20 +231,23 @@ export default function ActivityCard({ activity }: Props) {
 
             {/* Attendees */}
             <div className="flex min-w-0 items-center gap-2">
-              <Dialog>
-                <DialogTrigger className="min-w-0 flex-1">
+              <AttendeeList
+                attendees={attendees}
+                trigger={
                   <Button
                     variant="ghost"
                     className="w-full min-w-0 justify-start gap-2 px-2"
                   >
                     <AvatarGroup className="shrink-0">
                       {visibleAttendees.map((attendee) => (
-                        <Avatar key={attendee.name}>
+                        <Avatar key={attendee.userId}>
                           <AvatarImage
-                            src={attendee.avatar}
-                            alt={`@${attendee.name}`}
+                            src={attendee.profileImageUrl ?? undefined}
+                            alt={`@${attendee.profileName}`}
                           />
-                          <AvatarFallback>{attendee.initials}</AvatarFallback>
+                          <AvatarFallback>
+                            {getInitials(attendee.profileName)}
+                          </AvatarFallback>
                         </Avatar>
                       ))}
                       {hiddenAttendeesCount > 0 && (
@@ -274,39 +260,11 @@ export default function ActivityCard({ activity }: Props) {
                       id="card-activity-attendee"
                       className="min-w-0 flex-1 truncate text-left text-sm"
                     >
-                      {`Joined by ${getAttendeesLabel(attendees.map((a) => a.name))}`}
+                      {`Joined by ${getAttendeesLabel(attendees.map((a) => a.profileName))}`}
                     </span>
                   </Button>
-                </DialogTrigger>
-                <DialogContent className="flex max-h-[85vh] flex-col">
-                  <DialogHeader>
-                    <DialogTitle>Attendee Details</DialogTitle>
-                  </DialogHeader>
-                  <div className="-mx-4 no-scrollbar min-h-0 flex-1 overflow-y-auto px-4">
-                    {attendees.map((attendee) => (
-                      <div
-                        key={attendee.name}
-                        className="flex min-w-0 items-center gap-3 py-2"
-                      >
-                        <Avatar>
-                          <AvatarImage
-                            src={attendee.avatar}
-                            alt={`@${attendee.name}`}
-                          />
-                          <AvatarFallback>{attendee.initials}</AvatarFallback>
-                        </Avatar>
-                        <button
-                          type="button"
-                          onClick={() => navigate(`/profile/${attendee.name}`)}
-                          className="min-w-0 truncate text-left text-sm font-medium hover:underline"
-                        >
-                          {attendee.name}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </DialogContent>
-              </Dialog>
+                }
+              />
             </div>
           </div>
         </CardContent>
