@@ -5,7 +5,9 @@ import type { Profile } from "@/lib/types";
 
 type Props = {
   profile: Profile;
-  onEditProfile: () => void;
+  // Omitted when viewing another user's public profile - hides the edit
+  // affordance rather than duplicating this card into a read-only variant.
+  onEditProfile?: () => void;
 };
 
 export default function ProfileContact({ profile, onEditProfile }: Props) {
@@ -22,7 +24,7 @@ export default function ProfileContact({ profile, onEditProfile }: Props) {
           <p className="whitespace-pre-line text-sm text-muted-foreground">
             {profile.contactInfo}
           </p>
-        ) : (
+        ) : onEditProfile ? (
           <div className="flex flex-col items-start gap-3">
             <p className="text-sm text-muted-foreground">
               Add your club contact information so members know how to reach
@@ -37,6 +39,10 @@ export default function ProfileContact({ profile, onEditProfile }: Props) {
               Add Contact Info
             </Button>
           </div>
+        ) : (
+          <p className="text-sm text-muted-foreground italic">
+            No contact info provided.
+          </p>
         )}
       </CardContent>
     </Card>

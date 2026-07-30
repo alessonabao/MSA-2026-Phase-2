@@ -53,3 +53,19 @@ export const useProfile = () => {
     uploadProfilePicture,
   };
 };
+
+// Public profile view for any other user - any authenticated user can view any
+// other user's profile, so this hits GET /profile/{id} rather than the caller's
+// own GET /profile.
+export const useUserProfile = (userId?: string) => {
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ["profile", userId],
+    queryFn: async () => {
+      const response = await agent.get<Profile>(`/profile/${userId}`);
+      return response.data;
+    },
+    enabled: !!userId,
+  });
+
+  return { profile, isLoadingProfile };
+};

@@ -14,19 +14,6 @@ export default function App() {
       </main>
       <Toaster />
       <Footer />
-      {/* <BrowserRouter>
-        <NavBar />
-
-        <main>
-          <Routes>
-            <Route path="/" element={<Activities />} />
-            <Route path="/resources" element={<Resources />} />
-            <Route path="/profile" element={<Profile />} />
-          </Routes>
-        </main>
-
-        <Toaster />
-      </BrowserRouter> */}
     </ThemeProvider>
   );
 }

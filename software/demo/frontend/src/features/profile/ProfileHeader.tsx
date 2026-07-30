@@ -5,7 +5,9 @@ import type { Profile } from "@/lib/types";
 
 type Props = {
   profile: Profile;
-  onEditProfile: () => void;
+  // Omitted when viewing another user's public profile - hides the edit
+  // affordances rather than duplicating this header into a read-only variant.
+  onEditProfile?: () => void;
 };
 
 export default function ProfileHeader({ profile, onEditProfile }: Props) {
@@ -21,14 +23,16 @@ export default function ProfileHeader({ profile, onEditProfile }: Props) {
           alt={profile.profileName}
           className="h-full w-full object-cover"
         />
-        <button
-          type="button"
-          aria-label="Change profile photo"
-          onClick={onEditProfile}
-          className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xs transition-colors hover:bg-primary/80"
-        >
-          <Camera className="size-4" />
-        </button>
+        {onEditProfile && (
+          <button
+            type="button"
+            aria-label="Change profile photo"
+            onClick={onEditProfile}
+            className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xs transition-colors hover:bg-primary/80"
+          >
+            <Camera className="size-4" />
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col justify-center">
@@ -36,15 +40,17 @@ export default function ProfileHeader({ profile, onEditProfile }: Props) {
           <h1 className="text-3xl font-bold tracking-wide uppercase sm:text-4xl">
             {profile.profileName}
           </h1>
-          <Button
-            id="edit-profile-btn"
-            variant="outline"
-            size="sm"
-            onClick={onEditProfile}
-          >
-            <Pencil />
-            Edit Profile
-          </Button>
+          {onEditProfile && (
+            <Button
+              id="edit-profile-btn"
+              variant="outline"
+              size="sm"
+              onClick={onEditProfile}
+            >
+              <Pencil />
+              Edit Profile
+            </Button>
+          )}
         </div>
 
         {profile.profileBio ? (

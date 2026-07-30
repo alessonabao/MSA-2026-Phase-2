@@ -1,7 +1,10 @@
 import { Camera } from "lucide-react";
 import { Link } from "react-router";
+import { useAccount } from "@/lib/hooks/useAccount";
 
 export default function Footer() {
+  const { currentUser } = useAccount();
+
   return (
     <footer className="border-t bg-background">
       <div className="mx-auto max-w-7xl px-6 py-16">
@@ -40,12 +43,14 @@ export default function Footer() {
                 Resources
               </Link>
 
-              <Link
-                to="/profile"
-                className="transition-colors hover:text-primary"
-              >
-                Profile
-              </Link>
+              {currentUser && (
+                <Link
+                  to={`/profile/${currentUser.id}`}
+                  className="transition-colors hover:text-primary"
+                >
+                  Profile
+                </Link>
+              )}
             </nav>
           </div>
 

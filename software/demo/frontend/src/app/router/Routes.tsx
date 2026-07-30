@@ -4,7 +4,7 @@ import HomePage from "@/features/home/HomePage";
 import { ActivityForm } from "@/features/activities/form/ActivityForm";
 import ErrorPage from "@/features/ErrorPage";
 import Activities from "@/features/activities/Activities";
-import Profile from "@/features/profile/Profile";
+import UserProfilePage from "@/features/profile/UserProfilePage";
 import Resources from "@/features/resources/Resources";
 import ActivityDetailsPage from "@/features/activities/details/ActivityDetailsPage";
 import LoginForm from "@/features/account/LoginForm";
@@ -41,7 +41,7 @@ export const router = createBrowserRouter([
             element: <RequireRole allow={["ClubAdmin"]} />,
             children: [{ path: "manage/:id", element: <ActivityForm /> }],
           },
-          { path: "profile", element: <Profile /> },
+          { path: "profile/:userId", element: <UserProfilePage /> },
         ],
       },
       { index: true, element: <HomePage /> },

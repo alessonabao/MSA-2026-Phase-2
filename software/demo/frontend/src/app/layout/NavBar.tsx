@@ -88,7 +88,7 @@ export default function NavBar() {
 
           {currentUser ? (
             <NavLink
-              to="/profile"
+              to={`/profile/${currentUser.id}`}
               id="nav-profile"
               className={({ isActive }) =>
                 (isActive
@@ -173,7 +173,7 @@ export default function NavBar() {
                 </NavLink>
 
                 <NavLink
-                  to="/profile"
+                  to={`/profile/${currentUser?.id}`}
                   id="mobile-nav-profile"
                   onClick={closeMobileNav}
                   className={({ isActive }) =>
