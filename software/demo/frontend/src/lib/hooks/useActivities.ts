@@ -1,8 +1,74 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Activity, AttendanceStatus } from "../types";
+import type { Activity, AttendanceStatus, Attendee, AttendedActivity } from "../types";
 import agent from "../api/agent";
 import { useAccount } from "./useAccount";
 import { useLocation } from "react-router";
+
+// All attendees (excluding cancelled) for a single activity - shared by the event
+// card and the activity details page so both render the same real data instead of
+// each keeping their own mock list.
+export const useActivityAttendees = (activityId?: string) => {
+  const { currentUser } = useAccount();
+
+  const { data: attendees, isLoading: isLoadingAttendees } = useQuery({
+    queryKey: ["activities", activityId, "attendees"],
+    queryFn: async () => {
+      const response = await agent.get<Attendee[]>(
+        `/activities/${activityId}/attendees`,
+      );
+      return response.data;
+    },
+    enabled: !!activityId && !!currentUser,
+  });
+
+  return { attendees: attendees ?? [], isLoadingAttendees };
+};
+
+// The current user's own attendance (joined or cancelled) across every activity.
+// This is the single source of truth for: the profile timeline, the participation
+// filter, and the event card's "Attending"/"Cancelled" status badge.
+export const useMyAttendedActivities = () => {
+  const { currentUser } = useAccount();
+
+  const { data: myAttendedActivities, isLoading: isLoadingMyAttendedActivities } =
+    useQuery({
+      queryKey: ["activities", "mine"],
+      queryFn: async () => {
+        const response = await agent.get<AttendedActivity[]>("/activities/mine");
+        return response.data;
+      },
+      enabled: !!currentUser,
+    });
+
+  return {
+    myAttendedActivities: myAttendedActivities ?? [],
+    isLoadingMyAttendedActivities,
+  };
+};
+
+// A given user's attendance (joined or cancelled) across every activity - unlike
+// useMyAttendedActivities above, this isn't restricted to the current caller. Used
+// by the profile timeline, which is public on any profile, not just your own.
+export const useAttendedActivities = (userId?: string) => {
+  const { currentUser } = useAccount();
+
+  const { data: attendedActivities, isLoading: isLoadingAttendedActivities } =
+    useQuery({
+      queryKey: ["activities", "attendance", userId],
+      queryFn: async () => {
+        const response = await agent.get<AttendedActivity[]>(
+          `/activities/attendance/${userId}`,
+        );
+        return response.data;
+      },
+      enabled: !!userId && !!currentUser,
+    });
+
+  return {
+    attendedActivities: attendedActivities ?? [],
+    isLoadingAttendedActivities,
+  };
+};
 
 export const useActivities = (id?: string) => {
   const queryClient = useQueryClient();

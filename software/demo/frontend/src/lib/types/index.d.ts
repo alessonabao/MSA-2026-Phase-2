@@ -54,3 +54,16 @@ export type Profile = {
   isProfileComplete: boolean;
   badges: Badge[];
 };
+
+export type Attendee = {
+  userId: string;
+  profileName: string;
+  profileImageUrl: string | null;
+};
+
+export type AttendedActivity = {
+  activity: Activity;
+  isCancelled: boolean;
+  joinedAt: string;
+  cancelledAt: string | null;
+};
