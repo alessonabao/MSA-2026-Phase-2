@@ -15,6 +15,14 @@ public class ProfileController() : BaseApiController
                     return await Mediator.Send(new GetProfile.Query { UserId = CurrentUserId });
           }
 
+          // Any authenticated user can view any other user's public profile info -
+          // this is not restricted to the caller's own id, unlike CurrentUserId above.
+          [HttpGet("{id}")]
+          public async Task<ActionResult<ProfileDto>> GetProfileById(string id)
+          {
+                    return await Mediator.Send(new GetProfile.Query { UserId = id });
+          }
+
           [HttpPut]
           public async Task<ActionResult<ProfileDto>> UpdateProfile(UpdateProfileRequest request)
           {
