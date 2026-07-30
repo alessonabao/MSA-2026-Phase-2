@@ -7,11 +7,33 @@ import { useTheme } from "@/components/theme-provider";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAccount } from "@/lib/hooks/useAccount";
+import { useProfile } from "@/lib/hooks/useProfile";
+import { useUIStore } from "@/lib/stores/useUIStore";
+import { useGamificationStore } from "@/lib/stores/useGamificationStore";
 
 export default function NavBar() {
   const { theme } = useTheme();
   const { currentUser, logoutUser } = useAccount();
   const navigate = useNavigate();
+
+  // `useProfile` is already subscribed elsewhere (the Profile page) via
+  // TanStack Query - calling it again here doesn't trigger a second network
+  // request, it just reads the same cached data. That's how server state
+  // (the badge list) stays accessible from anywhere without prop drilling;
+  // it's only the "has the user seen this badge yet" bit below that needs
+  // Zustand, because there's no server concept of "seen".
+  const { profile } = useProfile();
+  const getUnseenBadges = useGamificationStore((state) => state.getUnseenBadges);
+  const unseenBadgeCount = currentUser
+    ? getUnseenBadges(profile?.badges ?? []).length
+    : 0;
+
+  // Mobile nav Sheet is controlled via the shared UI store (instead of
+  // Radix's uncontrolled internal state) so nav links below can close it
+  // when tapped, not just the SheetTrigger that opened it.
+  const isMobileNavOpen = useUIStore((state) => state.isMobileNavOpen);
+  const setMobileNavOpen = useUIStore((state) => state.setMobileNavOpen);
+  const closeMobileNav = useUIStore((state) => state.closeMobileNav);
 
   const handleLogout = () => {
     logoutUser.mutate(undefined, {
@@ -69,12 +91,16 @@ export default function NavBar() {
               to="/profile"
               id="nav-profile"
               className={({ isActive }) =>
-                isActive
+                (isActive
                   ? "border-b-2 border-primary pb-0.5 text-md font-semibold text-foreground"
-                  : "text-md text-muted-foreground transition-colors hover:text-foreground"
+                  : "text-md text-muted-foreground transition-colors hover:text-foreground") +
+                " relative"
               }
             >
               Profile
+              {unseenBadgeCount > 0 && (
+                <span className="absolute -right-2 -top-1 size-2 rounded-full bg-primary" />
+              )}
             </NavLink>
           ) : (
             ""
@@ -104,7 +130,7 @@ export default function NavBar() {
           )}
 
           {/* Mobile navigation */}
-          <Sheet>
+          <Sheet open={isMobileNavOpen} onOpenChange={setMobileNavOpen}>
             <SheetTrigger asChild>
               <Button
                 id="mobile-nav-menu"
@@ -123,6 +149,7 @@ export default function NavBar() {
                   to="/activities"
                   id="mobile-nav-events"
                   end
+                  onClick={closeMobileNav}
                   className={({ isActive }) =>
                     isActive
                       ? "font-semibold text-foreground"
@@ -135,6 +162,7 @@ export default function NavBar() {
                 <NavLink
                   to="/resources"
                   id="mobile-nav-resources"
+                  onClick={closeMobileNav}
                   className={({ isActive }) =>
                     isActive
                       ? "font-semibold text-foreground"
@@ -147,25 +175,33 @@ export default function NavBar() {
                 <NavLink
                   to="/profile"
                   id="mobile-nav-profile"
+                  onClick={closeMobileNav}
                   className={({ isActive }) =>
-                    isActive
+                    (isActive
                       ? "font-semibold text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground") +
+                    " relative"
                   }
                 >
                   Profile
+                  {unseenBadgeCount > 0 && (
+                    <span className="absolute -right-3 top-0 size-2 rounded-full bg-primary" />
+                  )}
                 </NavLink>
 
                 {currentUser ? (
                   <Button
                     id="mobile-nav-logout-btn"
                     className="mt-4 w-full"
-                    onClick={handleLogout}
+                    onClick={() => {
+                      closeMobileNav();
+                      handleLogout();
+                    }}
                   >
                     Logout
                   </Button>
                 ) : (
-                  <NavLink to="/login">
+                  <NavLink to="/login" onClick={closeMobileNav}>
                     <Button id="mobile-nav-login-btn" className="mt-4 w-full">
                       Login
                     </Button>

@@ -6,14 +6,13 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { useAccount } from "@/lib/hooks/useAccount";
+import { useActivityFilterStore } from "@/lib/stores/useActivityFilterStore";
 import type { Activity, Weapon, SkillLevel } from "@/lib/types";
 import {
-  DEFAULT_ACTIVITY_FILTERS,
   EVENT_TYPE_OPTIONS,
   getInitialCalendarMonth,
   SKILL_LEVEL_OPTIONS,
   WEAPON_OPTIONS,
-  type ActivityFilters,
   type ParticipationFilter,
 } from "./ActivityFilters";
 
@@ -24,8 +23,6 @@ const PARTICIPATION_OPTIONS: { value: ParticipationFilter; label: string }[] = [
 ];
 
 type Props = {
-  filters: ActivityFilters;
-  onFiltersChange: (filters: ActivityFilters) => void;
   activities: Activity[] | undefined;
 };
 
@@ -37,13 +34,12 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ActivityDashboardSidebar({
-  filters,
-  onFiltersChange,
-  activities,
-}: Props) {
+function ActivityDashboardSidebar({ activities }: Props) {
   const { currentUser } = useAccount();
   const isClubAdmin = currentUser?.role === "ClubAdmin";
+  const filters = useActivityFilterStore((state) => state.filters);
+  const onFiltersChange = useActivityFilterStore((state) => state.setFilters);
+  const resetFilters = useActivityFilterStore((state) => state.resetFilters);
 
   const toggleEventType = (eventType: (typeof EVENT_TYPE_OPTIONS)[number]) => {
     const isSelected = filters.eventTypes.includes(eventType);
@@ -171,7 +167,7 @@ function ActivityDashboardSidebar({
         <Button
           variant="outline"
           className="w-full uppercase tracking-wide"
-          onClick={() => onFiltersChange(DEFAULT_ACTIVITY_FILTERS)}
+          onClick={resetFilters}
         >
           Clear All Filters
         </Button>

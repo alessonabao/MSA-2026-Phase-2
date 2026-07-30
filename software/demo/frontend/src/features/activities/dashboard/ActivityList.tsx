@@ -1,15 +1,13 @@
 import ActivityCard from "./ActivityCard";
 import { useActivities } from "@/lib/hooks/useActivities";
 import { useAccount } from "@/lib/hooks/useAccount";
-import { filterActivities, type ActivityFilters } from "./ActivityFilters";
+import { filterActivities } from "./ActivityFilters";
+import { useActivityFilterStore } from "@/lib/stores/useActivityFilterStore";
 
-type Props = {
-  filters: ActivityFilters;
-};
-
-function ActivityList({ filters }: Props) {
+function ActivityList() {
   const { currentUser } = useAccount();
   const { activities, isLoading } = useActivities();
+  const filters = useActivityFilterStore((state) => state.filters);
 
   if (!currentUser) {
     return "You need to be logged in to view events.";

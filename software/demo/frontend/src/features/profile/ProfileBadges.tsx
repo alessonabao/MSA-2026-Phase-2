@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Award, CalendarCheck } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -5,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import type { Profile } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 import { getMissingProfileFields } from "./profileCompletion";
+import { useGamificationStore } from "@/lib/stores/useGamificationStore";
 
 type Props = {
   profile: Profile;
@@ -12,6 +14,22 @@ type Props = {
 };
 
 export default function ProfileBadges({ profile, onEditProfile }: Props) {
+  // profile.badges is server data (TanStack Query, via useProfile in the
+  // parent Profile page). "Which of these has the user already seen" has no
+  // backend equivalent, so it's tracked in the Zustand gamification store
+  // instead - see useGamificationStore for the full rationale.
+  const getUnseenBadges = useGamificationStore((state) => state.getUnseenBadges);
+  const markBadgesSeen = useGamificationStore((state) => state.markBadgesSeen);
+  const unseenBadgeIds = new Set(
+    getUnseenBadges(profile.badges).map((badge) => badge.id),
+  );
+
+  useEffect(() => {
+    if (profile.badges.length > 0) {
+      markBadgesSeen(profile.badges.map((badge) => badge.id));
+    }
+  }, [profile.badges, markBadgesSeen]);
+
   if (profile.badges.length === 0) {
     const missing = getMissingProfileFields(profile);
 
@@ -52,8 +70,12 @@ export default function ProfileBadges({ profile, onEditProfile }: Props) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {profile.badges.map((badge) => (
-        <Card key={badge.id} className="text-center">
+        <Card key={badge.id} className="relative text-center">
           <CardContent className="flex flex-col items-center gap-3">
+            {unseenBadgeIds.has(badge.id) && (
+              <Badge className="absolute right-3 top-3">New</Badge>
+            )}
+
             <div className="flex size-12 items-center justify-center rounded-lg bg-muted">
               <CalendarCheck className="size-6 text-foreground" />
             </div>
