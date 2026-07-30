@@ -71,15 +71,7 @@ export default function ActivityDetailsHeader() {
               {activity.title}
             </h1>
 
-            <p className="mt-1 text-sm text-gray-200">
-              Hosted by{" "}
-              <Link
-                to="/profile/fencing-club"
-                className="font-semibold text-white hover:underline"
-              >
-                Fencing Club
-              </Link>
-            </p>
+            <p className="mt-1 text-sm text-gray-200">Hosted by Fencing Club</p>
           </div>
 
           <div className="flex flex-wrap gap-3">

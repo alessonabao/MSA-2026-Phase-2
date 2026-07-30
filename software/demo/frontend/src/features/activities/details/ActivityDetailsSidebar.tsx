@@ -1,5 +1,4 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useParams } from "react-router";
 import { useActivities } from "@/lib/hooks/useActivities";
 
@@ -39,13 +38,6 @@ export default function ActivityDetailsSidebar() {
               {activity.price === 0 ? "FREE" : `$${activity.price.toFixed(2)}`}
             </p>
           </div>
-
-          <Button
-            size="lg"
-            className="w-full font-bold tracking-wide uppercase"
-          >
-            Join Event
-          </Button>
         </CardContent>
       </Card>
 

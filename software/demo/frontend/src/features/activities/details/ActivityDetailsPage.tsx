@@ -3,7 +3,6 @@ import { useActivities } from "@/lib/hooks/useActivities";
 import ActivityDetailsSidebar from "./ActivityDetailsSidebar";
 import ActivityDetailsHeader from "./ActivityDetailsHeader";
 import ActivityDetailsDescription from "./ActivityDetailsDescription";
-import ActivityDetailsForum from "./ActivityDetailsForum";
 
 export default function ActivityDetailsPage() {
   const { id } = useParams();
@@ -23,7 +22,6 @@ export default function ActivityDetailsPage() {
         <div className="lg:col-span-2">
           <ActivityDetailsHeader />
           <ActivityDetailsDescription />
-          <ActivityDetailsForum />
         </div>
         <div>
           <ActivityDetailsSidebar />
