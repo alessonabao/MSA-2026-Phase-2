@@ -67,6 +67,13 @@ export default defineConfig({
       // point of seeding a known state. Stop your own `npm run dev` before running e2e.
       reuseExistingServer: false,
       stdout: "pipe",
+      // VITE_API_URL normally comes from .env.development, which is gitignored and so
+      // doesn't exist on CI runners - set it explicitly so the app doesn't crash on
+      // import (src/lib/utils.ts reads it at module scope) when that file is absent.
+      env: {
+        ...process.env,
+        VITE_API_URL: `${BACKEND_URL}/api`,
+      },
     },
     {
       // Delete any e2e database left over from a previous run, then start the backend -
