@@ -64,11 +64,23 @@ on:
         type: string
 
       # --------------------------------------------------------
-      # The command used to run tests.
+      # The command used to run unit tests. Required for both
+      # frontend and backend.
       # --------------------------------------------------------
-      test-command:
-        description: "Command used to run tests"
+      unit-test-command:
+        description: "Command used to run unit tests"
         required: true
+        type: string
+
+      # --------------------------------------------------------
+      # E2E test command — frontend only. Skipped entirely (along
+      # with the Playwright browser install/report upload) if not
+      # provided, since backend has no e2e suite.
+      # --------------------------------------------------------
+      e2e-test-command:
+        description: "Command used to run e2e tests (frontend only)"
+        required: false
+        default: ""
         type: string
 
 jobs:
@@ -149,26 +161,36 @@ jobs:
         run: ${{ inputs.build-command }}
 
       # --------------------------------------------------------
-      # Install Playwright browsers — frontend only.
-      # Only installs Chromium to keep the step fast.
+      # Run unit tests using the command from the caller.
+      # Required for both frontend and backend.
+      # --------------------------------------------------------
+      - name: Run unit tests
+        run: ${{ inputs.unit-test-command }}
+
+      # --------------------------------------------------------
+      # Install Playwright browsers — frontend only, and only if
+      # e2e-test-command is provided.
       # --------------------------------------------------------
       - name: Install Playwright browsers
-        if: inputs.project-type == 'frontend'
+        if: inputs.project-type == 'frontend' && inputs.e2e-test-command != ''
         run: npx playwright install --with-deps chromium
 
       # --------------------------------------------------------
-      # Run tests using the command from the caller.
+      # Run e2e tests — frontend only, and only if
+      # e2e-test-command is provided.
       # --------------------------------------------------------
-      - name: Run tests
-        run: ${{ inputs.test-command }}
+      - name: Run e2e tests
+        if: inputs.e2e-test-command != ''
+        run: ${{ inputs.e2e-test-command }}
 
       # --------------------------------------------------------
-      # Upload Playwright HTML report — frontend only.
-      # always() ensures this runs even when tests fail so you
-      # can download the report and inspect what went wrong.
+      # Upload Playwright HTML report — frontend only, and only
+      # if e2e-test-command is provided. always() ensures this
+      # runs even when tests fail so you can download the report
+      # and inspect what went wrong.
       # --------------------------------------------------------
       - name: Upload Playwright report
-        if: inputs.project-type == 'frontend' && always()
+        if: inputs.project-type == 'frontend' && inputs.e2e-test-command != '' && always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
