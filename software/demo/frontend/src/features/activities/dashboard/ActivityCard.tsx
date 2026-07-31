@@ -47,7 +47,7 @@ import {
   BookHeart,
 } from "lucide-react";
 import { useNavigate } from "react-router";
-import { formatDate, getInitials } from "@/lib/utils";
+import { formatDate, getInitials, resolveImageUrl } from "@/lib/utils";
 import { useAccount } from "@/lib/hooks/useAccount";
 import {
   useActivities,
@@ -242,7 +242,11 @@ export default function ActivityCard({ activity }: Props) {
                       {visibleAttendees.map((attendee) => (
                         <Avatar key={attendee.userId}>
                           <AvatarImage
-                            src={attendee.profileImageUrl ?? undefined}
+                            src={
+                              attendee.profileImageUrl
+                                ? resolveImageUrl(attendee.profileImageUrl)
+                                : undefined
+                            }
                             alt={`@${attendee.profileName}`}
                           />
                           <AvatarFallback>

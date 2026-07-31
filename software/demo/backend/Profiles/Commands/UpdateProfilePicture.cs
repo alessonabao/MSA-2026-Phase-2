@@ -74,7 +74,12 @@ public class UpdateProfilePicture
                               }
 
                               user.ProfileImageUrl = $"/uploads/profile-pictures/{fileName}";
-                              await userManager.UpdateAsync(user);
+                              var updateResult = await userManager.UpdateAsync(user);
+
+                              if (!updateResult.Succeeded)
+                              {
+                                        throw new Exception($"Failed to save profile picture: {string.Join(", ", updateResult.Errors.Select(e => e.Description))}");
+                              }
 
                               if (await userManager.IsInRoleAsync(user, Roles.Member))
                               {

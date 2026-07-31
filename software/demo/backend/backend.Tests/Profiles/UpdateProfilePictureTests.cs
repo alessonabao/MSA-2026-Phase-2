@@ -90,4 +90,34 @@ public class UpdateProfilePictureTests
             Directory.Delete(tempRoot, recursive: true);
         }
     }
+
+    [Fact]
+    public async Task Handle_ThrowsWhenUpdateAsyncFails()
+    {
+        // Arrange: e.g. Identity's optimistic-concurrency check rejects the update. The file
+        // still gets written to disk, but the handler must not report success while the DB
+        // still points at whatever the old ProfileImageUrl was - that leaves a file on disk
+        // no one references and a stale/possibly-deleted file referenced in the DB.
+        var tempRoot = Directory.CreateTempSubdirectory().FullName;
+        try
+        {
+            using var context = TestDbContextFactory.Create();
+            var user = TestUserFactory.Create();
+            var userManager = TestIdentityFactory.MockUserManager();
+            userManager.Setup(x => x.FindByIdAsync(user.Id)).ReturnsAsync(user);
+            userManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(
+                IdentityResult.Failed(new IdentityError { Description = "Optimistic concurrency failure." }));
+            var uploadPaths = new UploadPaths { ProfilePicturesDirectory = tempRoot };
+            var handler = new UpdateProfilePicture.Handler(context, userManager.Object, uploadPaths);
+            var file = CreateFormFile("image/png", 1024);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<Exception>(() =>
+                handler.Handle(new UpdateProfilePicture.Command { UserId = user.Id, File = file }, CancellationToken.None));
+        }
+        finally
+        {
+            Directory.Delete(tempRoot, recursive: true);
+        }
+    }
 }

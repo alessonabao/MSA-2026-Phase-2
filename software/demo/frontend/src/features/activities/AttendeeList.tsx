@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getInitials } from "@/lib/utils";
+import { getInitials, resolveImageUrl } from "@/lib/utils";
 import type { Attendee } from "@/lib/types";
 
 type Props = {
@@ -39,7 +39,11 @@ export default function AttendeeList({ attendees, trigger }: Props) {
             >
               <Avatar>
                 <AvatarImage
-                  src={attendee.profileImageUrl ?? undefined}
+                  src={
+                    attendee.profileImageUrl
+                      ? resolveImageUrl(attendee.profileImageUrl)
+                      : undefined
+                  }
                   alt={`@${attendee.profileName}`}
                 />
                 <AvatarFallback>
