@@ -1,79 +1,92 @@
 import { defineConfig, devices } from "@playwright/test";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const FRONTEND_URL = "http://localhost:5173";
+const BACKEND_URL = "http://localhost:5000";
 
 /**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
-
-/**
- * See https://playwright.dev/docs/test-configuration.
+ * E2E tests drive the app against a real .NET backend + a seeded SQLite database that is
+ * separate from the developer's own `fencingclub.db` (see webServer below), never mocked
+ * API routes. See software/demo/frontend/README or /specs for the full rationale.
  */
 export default defineConfig({
   testDir: "./tests",
-  /* Run tests in files in parallel */
-  fullyParallel: true,
+
+  // Single shared SQLite file, no per-worker data isolation - serial execution avoids
+  // SQLite write-lock contention and cross-test data collisions entirely, which is a much
+  // simpler tradeoff than building per-worker DB isolation for a suite this size.
+  fullyParallel: false,
+  workers: 1,
+
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
+
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Base URL to use in actions like `await page.goto('')`. */
-    // baseURL: 'http://localhost:3000',
-
+    baseURL: FRONTEND_URL,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
   },
 
-  /* Configure projects for major browsers */
+  // The app's axios interceptor (src/lib/api/agent.ts) artificially delays every API
+  // response by ~1s to simulate loading states - give auto-retrying assertions enough
+  // headroom above that baseline instead of fighting the default 5s expect timeout.
+  expect: {
+    timeout: 10_000,
+  },
+
   projects: [
+    {
+      // Logs in as the seeded Member and ClubAdmin accounts once and saves their
+      // storageState, so the rest of the suite reuses an authenticated session instead
+      // of logging in from scratch in every spec.
+      name: "setup",
+      testMatch: /.*\.setup\.ts/,
+    },
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+      dependencies: ["setup"],
     },
-
-    // {
-    //   name: "firefox",
-    //   use: { ...devices["Desktop Firefox"] },
-    // },
-
-    // {
-    //   name: "webkit",
-    //   use: { ...devices["Desktop Safari"] },
-    // },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: "Mobile Chrome",
-    //   use: { ...devices["Pixel 5"] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
   ],
 
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  /* Start both the Vite dev server and the .NET backend automatically before running tests. */
+  webServer: [
+    {
+      command: "npm run dev",
+      url: FRONTEND_URL,
+      // Never reuse an already-running dev server: it would be pointed at your real
+      // fencingclub.db, not the isolated/reset e2e database below, silently defeating the
+      // point of seeding a known state. Stop your own `npm run dev` before running e2e.
+      reuseExistingServer: false,
+      stdout: "pipe",
+    },
+    {
+      // Delete any e2e database left over from a previous run, then start the backend -
+      // its existing startup path (Program.cs) migrates and reseeds automatically, so
+      // this is the entire reset/reseed step. Runs once, before the whole suite.
+      command:
+        'sh -c "rm -f fencingclub.e2e.db fencingclub.e2e.db-shm fencingclub.e2e.db-wal && dotnet run"',
+      cwd: path.resolve(__dirname, "../backend"),
+      // GET /api/account/user-info is [AllowAnonymous] and returns 204 when logged out -
+      // a lightweight existing endpoint, no need for a dedicated health check.
+      url: `${BACKEND_URL}/api/account/user-info`,
+      reuseExistingServer: false,
+      // Cold `dotnet run` (build + migrate + seed) can comfortably take longer than
+      // Playwright's 60s webServer default, especially on the first run.
+      timeout: 120_000,
+      env: {
+        ...process.env,
+        ConnectionStrings__DefaultConnection: "Data source=fencingclub.e2e.db",
+      },
+      stdout: "pipe",
+    },
+  ],
 });
