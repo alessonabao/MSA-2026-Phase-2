@@ -45,5 +45,8 @@ jobs:
       # TypeScript check + Vite bundle
       build-command: npm run build
 
+      # Run Vitest unit tests
+      unit-test-command: npm run test
+
       # Run Playwright e2e tests
-      test-command: npm run test:e2e
+      e2e-test-command: npm run test:e2e

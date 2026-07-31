@@ -52,4 +52,4 @@ jobs:
       # Run the backend.Tests project via the solution.
       # --no-build skips recompiling since the build step above
       # already compiled everything.
-      test-command: dotnet test backend.sln --no-build --configuration Release
+      unit-test-command: dotnet test backend.sln --no-build --configuration Release
