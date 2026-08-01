@@ -11,8 +11,8 @@ For more information, visit the wiki of this repo: https://github.com/alessonaba
 
 ## Live Deployment
 
-- Frontend: _TODO — add deployment URL_
-- Backend / API: _TODO — add deployment URL_
+- App: https://engarde-webapp-d3htcphje5eqh3d8.newzealandnorth-01.azurewebsites.net/
+- API Docs: https://engarde-webapp-d3htcphje5eqh3d8.newzealandnorth-01.azurewebsites.net/scalar/
 
 ## Test Credentials
 
@@ -26,40 +26,44 @@ These accounts are seeded automatically on backend startup (`DbSeedData.cs`) so 
 The Member account can browse events, RSVP, and earn badges. The Club Admin account can additionally create, edit, and delete events.
 
 ## Screenshots
-
-> _TODO — capture each shot below (desktop **and** mobile width, to demonstrate the responsive UI requirement) and save under `software/demo/docs/screenshots/` using the suggested filenames. Embed each with:_
-> `![Alt text](software/demo/docs/screenshots/filename.png)`
-
 ### Home / Landing Page
-- [ ] Desktop — `home-desktop.png`
-- [ ] Mobile — `home-mobile.png`
+<img width="2560" height="4154" alt="image" src="https://github.com/user-attachments/assets/0d12fde3-6051-49ca-b3a4-1718ad850558" />
 
 ### Activities Dashboard (browse + filters)
-- [ ] Desktop — `dashboard-desktop.png`
-- [ ] Mobile — `dashboard-mobile.png`
+<img width="2560" height="2586" alt="image" src="https://github.com/user-attachments/assets/8a0d5b0b-85cd-4af5-a1c3-912dda6c2652" />
 
-### Activity Details (RSVP / join / cancel)
-- [ ] Desktop — `activity-details-desktop.png`
-- [ ] Mobile — `activity-details-mobile.png`
+### Activity Details
+<img width="2560" height="2274" alt="image" src="https://github.com/user-attachments/assets/ceb8341c-f6ab-4503-8f92-47fbd9553b3c" />
 
-### Login / Register
-- [ ] Desktop — `auth-desktop.png`
-- [ ] Mobile — `auth-mobile.png`
+### Login
+<img width="2560" height="1964" alt="image" src="https://github.com/user-attachments/assets/b7f15c10-7a37-4385-b5e2-d2bc891660f5" />
+
+### Register
+<img width="2560" height="2146" alt="image" src="https://github.com/user-attachments/assets/2ae61d53-8b18-4560-9c90-8afb5155c0d4" />
 
 ### Member Profile (badges + event history)
-- [ ] Desktop — `profile-desktop.png`
-- [ ] Mobile — `profile-mobile.png`
+<img width="2560" height="2564" alt="image" src="https://github.com/user-attachments/assets/3733769d-c3d9-4806-9bd2-0270d4fe4058" />
 
-### Admin: Create/Edit Activity Form
-*(log in as the Club Admin test account above)*
-- [ ] Desktop — `activity-form-desktop.png`
-- [ ] Mobile — `activity-form-mobile.png`
+### Member Update Profile
+<img width="2560" height="2564" alt="image" src="https://github.com/user-attachments/assets/f5485f72-9ca4-46d1-ace9-9f086b4e03a0" />
+
+### Admin: Dashboard
+<img width="2560" height="2567" alt="image" src="https://github.com/user-attachments/assets/f8bfc92d-6735-4330-9b5f-ad2a4cb33f55" />
+
+### Admin: Create
+<img width="2560" height="3186" alt="image" src="https://github.com/user-attachments/assets/afcb0d3e-4473-4aa5-8327-b2f0cf4e6bff" />
+
+### Admin: Delete
+<img width="2556" height="1082" alt="image" src="https://github.com/user-attachments/assets/ec98c650-f9d4-4567-9c22-42645604d2a9" />
 
 ### Mobile Navigation Menu (open state)
-- [ ] Mobile — `nav-mobile-open.png`
+<img width="340" height="640" alt="image" src="https://github.com/user-attachments/assets/9ef7b357-6b9e-425c-89ee-3990a5851344" /> <img width="340" height="640" alt="image" src="https://github.com/user-attachments/assets/b997b14a-32d9-481f-aaeb-4669b9fda5d8" />
 
 ### Light vs. Dark Mode
-- [ ] Same page, side by side — `theme-light-dark.png`
+<img width="2560" height="2488" alt="image" src="https://github.com/user-attachments/assets/4456785b-2a71-4611-a95a-03ef9761465e" />
+<img width="2560" height="2485" alt="image" src="https://github.com/user-attachments/assets/5dd1db07-1d1f-405d-875a-e70d003a68e1" />
+
+
 
 ## How EnGarde Relates to the Theme (Gamification)
 
