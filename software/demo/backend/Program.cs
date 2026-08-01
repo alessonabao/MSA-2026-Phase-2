@@ -34,10 +34,10 @@ builder.Services.AddControllers(opt =>
 });
 builder.Services.AddOpenApi();
 
-// Add SQLite DB, refer to appsettings.json
+// Add SQL SERVER DB, refer to appsettings.json
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 // register MediatR handler
@@ -66,11 +66,21 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 
+// Static files must run before UseRouting() - otherwise routing matches "/" (and other
+// extensionless paths) to MapFallbackToController before static file middleware gets a
+// chance to serve wwwroot/index.html or /uploads directly.
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(uploadsRoot),
     RequestPath = "/uploads"
 });
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+// UseAuthorization() must run after UseRouting() (so the endpoint - and its [Authorize]
+// metadata - has already been matched) and before the Map* calls that execute it.
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -79,6 +89,7 @@ app.MapOpenApi();
 app.MapScalarApiReference();
 app.MapControllers();
 app.MapGroup("api").MapIdentityApi<User>();
+app.MapFallbackToController("Index", "Fallback");
 
 // create a service scope: when function goes out of scope (run the app using app.Run()), 
 // anything used will be disposed by the framework 

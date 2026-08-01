@@ -6,6 +6,12 @@ import { useAccount } from "@/lib/hooks/useAccount";
 import { useActivities } from "@/lib/hooks/useActivities";
 import { Link, useParams } from "react-router";
 
+// Asset filenames are plain ASCII (deploy zip tooling mangles accented filenames),
+// so "Épée" needs a separate lookup from its display label.
+const WEAPON_IMAGE_FILENAME: Record<string, string> = {
+  Épée: "Epee",
+};
+
 export default function ActivityDetailsHeader() {
   const { id } = useParams();
   const { currentUser } = useAccount();
@@ -49,7 +55,7 @@ export default function ActivityDetailsHeader() {
       <Card className="relative overflow-hidden rounded-xl pt-0 mb-4">
         {/* Cover Image */}
         <img
-          src={`/images/weaponImages/${activity.weapon}.jpg`}
+          src={`/images/weaponImages/${WEAPON_IMAGE_FILENAME[activity.weapon] ?? activity.weapon}.jpg`}
           alt={`${activity.weapon} fencing`}
           className="h-50 w-full object-cover brightness-60 grayscale sm:h-65 lg:h-80 dark:brightness-40"
         />

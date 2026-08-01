@@ -41,7 +41,7 @@ export default function HomePage() {
         >
           <div className="lg:col-span-2">
             <img
-              src="/images/weaponImages/Épée.jpg"
+              src="/images/weaponImages/Epee.jpg"
               alt="Épée"
               className="aspect-video w-full rounded-xl object-cover"
             />

@@ -12,6 +12,8 @@ export default defineConfig({
     },
   },
   build: {
+    outDir: "../backend/wwwroot",
+    emptyOutDir: true,
     rollupOptions: {
       output: {
         manualChunks(id) {
