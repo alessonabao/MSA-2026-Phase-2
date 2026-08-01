@@ -1,4 +1,5 @@
 .vscode/settings.json
+.claude/
 .DS_Store
 
 # .NET (covers backend/bin, backend/obj, and backend.Tests/bin, backend.Tests/obj alike)
@@ -32,11 +33,6 @@ software/demo/backend/fencingclub.db
 software/demo/backend/fencingclub.db-shm
 software/demo/backend/fencingclub.db-wal
 
-# E2E test database - reset and reseeded on every Playwright run (see webServer in
-# software/demo/frontend/playwright.config.ts), never persisted between runs.
-software/demo/backend/fencingclub.e2e.db
-software/demo/backend/fencingclub.e2e.db-shm
-software/demo/backend/fencingclub.e2e.db-wal
 
 # Playwright
 test-results/

@@ -88,6 +88,23 @@ jobs:
     name: CI
     runs-on: ubuntu-latest
 
+    # Only the frontend job's e2e step actually talks to this (the backend is SQL-Server-only
+    # end to end - see playwright.config.ts), but GitHub Actions services start unconditionally
+    # for the whole job, so the backend-only CI run pays a small, harmless startup cost too.
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          MSSQL_SA_PASSWORD: "Password@1"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P Password@1 -Q 'SELECT 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
     defaults:
       run:
         working-directory: ${{ inputs.working-directory }}

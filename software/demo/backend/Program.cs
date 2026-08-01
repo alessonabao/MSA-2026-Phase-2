@@ -104,6 +104,14 @@ try
           var userManager = services.GetRequiredService<UserManager<User>>();
           var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
+          // e2e runs need a clean, known-seeded database every time (a stale row from a
+          // previous run can break an assertion that expects an exact count) - opt-in via
+          // env var so this never runs against a real dev/production database by accident.
+          if (builder.Configuration.GetValue<bool>("E2E_RESET_DB"))
+          {
+                    await context.Database.EnsureDeletedAsync();
+          }
+
           // creates a database when there's no db or apply pending migrations
           await context.Database.MigrateAsync();
 
