@@ -8,16 +8,16 @@ const FRONTEND_URL = "http://localhost:5173";
 const BACKEND_URL = "http://localhost:5000";
 
 /**
- * E2E tests drive the app against a real .NET backend + a seeded SQLite database that is
- * separate from the developer's own `fencingclub.db` (see webServer below), never mocked
+ * E2E tests drive the app against a real .NET backend + a seeded SQL Server database that is
+ * separate from the developer's own `fencingclub` database (see webServer below), never mocked
  * API routes. See software/demo/frontend/README or /specs for the full rationale.
  */
 export default defineConfig({
   testDir: "./tests",
 
-  // Single shared SQLite file, no per-worker data isolation - serial execution avoids
-  // SQLite write-lock contention and cross-test data collisions entirely, which is a much
-  // simpler tradeoff than building per-worker DB isolation for a suite this size.
+  // Single shared database, no per-worker data isolation - serial execution avoids
+  // cross-test data collisions entirely, which is a much simpler tradeoff than building
+  // per-worker DB isolation for a suite this size.
   fullyParallel: false,
   workers: 1,
 
@@ -63,8 +63,8 @@ export default defineConfig({
       command: "npm run dev",
       url: FRONTEND_URL,
       // Never reuse an already-running dev server: it would be pointed at your real
-      // fencingclub.db, not the isolated/reset e2e database below, silently defeating the
-      // point of seeding a known state. Stop your own `npm run dev` before running e2e.
+      // fencingclub database, not the isolated/reset e2e database below, silently defeating
+      // the point of seeding a known state. Stop your own `npm run dev` before running e2e.
       reuseExistingServer: false,
       stdout: "pipe",
       // VITE_API_URL normally comes from .env.development, which is gitignored and so
@@ -76,11 +76,12 @@ export default defineConfig({
       },
     },
     {
-      // Delete any e2e database left over from a previous run, then start the backend -
-      // its existing startup path (Program.cs) migrates and reseeds automatically, so
-      // this is the entire reset/reseed step. Runs once, before the whole suite.
-      command:
-        'sh -c "rm -f fencingclub.e2e.db fencingclub.e2e.db-shm fencingclub.e2e.db-wal && dotnet run"',
+      // Points at a SQL Server instance - the same local Docker container from
+      // docker-compose.yml for local runs, or the mssql service container reusable-ci.yml
+      // spins up in CI - using a database name dedicated to e2e so it never touches a
+      // developer's own `fencingclub` database. E2E_RESET_DB=true (see Program.cs) drops
+      // that database on every startup so each run starts from a clean, known-seeded state.
+      command: "dotnet run",
       cwd: path.resolve(__dirname, "../backend"),
       // GET /api/account/user-info is [AllowAnonymous] and returns 204 when logged out -
       // a lightweight existing endpoint, no need for a dedicated health check.
@@ -91,7 +92,9 @@ export default defineConfig({
       timeout: 120_000,
       env: {
         ...process.env,
-        ConnectionStrings__DefaultConnection: "Data source=fencingclub.e2e.db",
+        ConnectionStrings__DefaultConnection:
+          "Server=localhost,1433;Database=fencingclub_e2e;User Id=SA;Password=Password@1;TrustServerCertificate=True",
+        E2E_RESET_DB: "true",
       },
       stdout: "pipe",
     },
