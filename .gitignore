@@ -14,10 +14,15 @@ software/demo/frontend/node_modules/
 software/demo/frontend/dist/
 software/demo/frontend/dist-ssr/
 
+# Frontend build output - vite.config.ts writes it into backend/wwwroot so the published
+# backend can serve it, but it's generated (npm run build), not source. Keep the folder
+# tracked via .gitkeep so `dotnet run`/deploy pipelines that expect it to exist still work
+# on a fresh clone before the frontend has been built.
+software/demo/backend/wwwroot/*
+!software/demo/backend/wwwroot/.gitkeep
+
 # Environment
-.env
-.env.development
-.env.local
+.env*
 .DS_Store
 .vscode
 
