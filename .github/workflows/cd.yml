@@ -104,6 +104,13 @@ jobs:
 
       - name: Build frontend
         working-directory: ${{ env.FRONTEND_DIR }}
+        # .env.production (gitignored) supplies this locally; CI has no working
+        # directory .env file, so it must be set explicitly here. Vite bakes it
+        # into the bundle at build time - if unset, code that reads
+        # import.meta.env.VITE_API_URL at module load (utils.ts) throws instead
+        # of rendering the app.
+        env:
+          VITE_API_URL: /api
         run: npm run build
 
       # --------------------------------------------------------
