@@ -1,0 +1,128 @@
+# ============================================================
+# CD Pipeline
+# Deploys to the Azure Web App after Backend CI and Frontend CI
+# have both completed successfully for the same commit on main.
+#
+# The app is a single Azure Web App: the frontend is built as
+# static assets directly into backend/wwwroot (see vite.config.ts),
+# then the backend is published and the combined output is
+# deployed as one unit. EF Core migrations run automatically on
+# startup (see Program.cs), so no separate migration step is
+# needed here.
+# ============================================================
+
+name: CD
+
+on:
+  workflow_run:
+    workflows:
+      - "Backend CI"
+      - "Frontend CI"
+    types:
+      - completed
+    branches:
+      - main
+
+env:
+  AZURE_WEBAPP_NAME: engarde-webapp
+  DOTNET_VERSION: "10.0.x"
+  NODE_VERSION: "24"
+  BACKEND_DIR: software/demo/backend
+  FRONTEND_DIR: software/demo/frontend
+
+jobs:
+  # ------------------------------------------------------------
+  # Backend CI and Frontend CI both trigger this workflow
+  # independently (whichever finishes last fires the deploy), and
+  # a push whose changes don't touch a project's path filter never
+  # runs that project's CI at all. This job resolves both cases by
+  # asking the GitHub API for every workflow run recorded against
+  # the exact commit that triggered this event, then only allows
+  # the deploy to proceed once none of the CI workflows that did
+  # run for that commit are still running or failed.
+  # ------------------------------------------------------------
+  gate:
+    name: Check CI status
+    runs-on: ubuntu-latest
+    outputs:
+      proceed: ${{ steps.check.outputs.proceed }}
+      sha: ${{ github.event.workflow_run.head_sha }}
+    steps:
+      - name: Evaluate CI runs for this commit
+        id: check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = context.payload.workflow_run.head_sha;
+            const { data } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head_sha: sha,
+            });
+
+            const relevant = data.workflow_runs.filter(r =>
+              ["Backend CI", "Frontend CI"].includes(r.name)
+            );
+
+            const stillRunning = relevant.some(r => r.status !== "completed");
+            const failed = relevant.some(r => r.conclusion && r.conclusion !== "success");
+
+            const proceed = !stillRunning && !failed;
+            core.info(`CI runs for ${sha}: ${relevant.map(r => `${r.name}=${r.status}/${r.conclusion}`).join(", ") || "(none found)"}`);
+            core.info(`stillRunning=${stillRunning} failed=${failed} proceed=${proceed}`);
+            core.setOutput("proceed", String(proceed));
+
+  deploy:
+    name: Build and deploy
+    needs: gate
+    if: needs.gate.outputs.proceed == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://engarde-webapp-d3htcphje5eqh3d8.newzealandnorth-01.azurewebsites.net
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.gate.outputs.sha }}
+
+      # --------------------------------------------------------
+      # Build the frontend. vite.config.ts writes the output
+      # straight into backend/wwwroot, so this must run before
+      # the backend publish step below.
+      # --------------------------------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.FRONTEND_DIR }}/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: npm run build
+
+      # --------------------------------------------------------
+      # Publish the backend. The Web SDK includes wwwroot content
+      # automatically, so the frontend build output above is
+      # picked up as part of this publish.
+      # --------------------------------------------------------
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Publish backend
+        working-directory: ${{ env.BACKEND_DIR }}
+        run: dotnet publish backend.csproj --configuration Release --output ./publish
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ env.BACKEND_DIR }}/publish
