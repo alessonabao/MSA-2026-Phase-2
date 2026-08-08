@@ -40,75 +40,78 @@ export default function VideoCarousel({
   const prev = () => setPage((p) => Math.max(0, p - 1));
   const next = () => setPage((p) => Math.min(totalPages - 1, p + 1));
 
+  const renderCard = (item: CarouselItem) => (
+    <Card
+      key={item.title}
+      className="overflow-hidden border border-border rounded-xl p-0 gap-0"
+    >
+      {/* Video with duration badge */}
+      <div className="relative aspect-video bg-black">
+        <iframe
+          className="w-full h-full"
+          src={item.videoSrc}
+          title={item.title}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+        {/* Duration badge */}
+        <span className="absolute bottom-3 left-3 bg-[#1a2a4a]/90 text-white text-xs font-mono font-semibold px-2 py-0.5 rounded">
+          {item.duration}
+        </span>
+      </div>
+      {/* Text content */}
+      <CardContent className="p-5 space-y-2">
+        <h3 className="text-lg font-bold tracking-tight">{item.title}</h3>
+        <p className="text-muted-foreground text-sm text-justify leading-relaxed">
+          {item.description}
+        </p>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div id="weapons-section">
-      <div id="weapons-header" className="grid grid-cols-4">
-        <div className="section-title col-span-3">{heading}</div>
-        <div id="weapons-carousel-btn">
-          {/* Previous / Next buttons in weapons section */}
-          <section className="px-[50%] py-5 max-w-6xl mx-auto">
-            <div className="flex gap-2 mt-1">
-              {/* Previous Button */}
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={prev}
-                disabled={page === 0}
-                className="h-10 w-10 rounded-md"
-                aria-label="Previous"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              {/* Next Button */}
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={next}
-                disabled={page === totalPages - 1}
-                className="h-10 w-10 rounded-md"
-                aria-label="Next"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </section>
+      <div id="weapons-header" className="grid grid-cols-1 sm:grid-cols-4">
+        <div className="section-title sm:col-span-3">{heading}</div>
+        {/* Previous / Next buttons in weapons section - carousel is desktop-only */}
+        <div id="weapons-carousel-btn" className="hidden sm:flex sm:justify-end">
+          <div className="flex gap-2 mt-1 py-5">
+            {/* Previous Button */}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={prev}
+              disabled={page === 0}
+              className="h-10 w-10 rounded-md"
+              aria-label="Previous"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            {/* Next Button */}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={next}
+              disabled={page === totalPages - 1}
+              className="h-10 w-10 rounded-md"
+              aria-label="Next"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
       <div id="weapons-content">
-        <div className={`grid grid-cols-1 gap-5 ${colClass}`}>
-          {visible.map((item) => (
-            <Card
-              key={item.title}
-              className="overflow-hidden border border-border rounded-xl p-0 gap-0"
-            >
-              {/* Video with duration badge */}
-              <div className="relative aspect-video bg-black">
-                <iframe
-                  className="w-full h-full"
-                  src={item.videoSrc}
-                  title={item.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-                {/* Duration badge */}
-                <span className="absolute bottom-3 left-3 bg-[#1a2a4a]/90 text-white text-xs font-mono font-semibold px-2 py-0.5 rounded">
-                  {item.duration}
-                </span>
-              </div>
-              {/* Text content */}
-              <CardContent className="p-5 space-y-2">
-                <h3 className="text-lg font-bold tracking-tight">
-                  {item.title}
-                </h3>
-                <p className="text-muted-foreground text-sm text-justify leading-relaxed">
-                  {item.description}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Mobile: all weapons stacked, no carousel */}
+        <div className="grid grid-cols-1 gap-5 sm:hidden">
+          {items.map(renderCard)}
         </div>
-        {/* Page indicator dots */}
-        <div className="flex justify-center gap-1.5 mt-6">
+        {/* Desktop: paginated carousel */}
+        <div className={`hidden sm:grid grid-cols-1 gap-5 ${colClass}`}>
+          {visible.map(renderCard)}
+        </div>
+        {/* Page indicator dots - desktop only */}
+        <div className="hidden sm:flex justify-center gap-1.5 mt-6">
           {Array.from({ length: totalPages }).map((_, i) => (
             <button
               key={i}

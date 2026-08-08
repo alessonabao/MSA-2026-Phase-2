@@ -57,7 +57,7 @@ export default function Resources() {
     <>
       {/* Introduction */}
       <div id="introduction-section">
-        <Card className="relative overflow-hidden w-full h-100 border-none rounded-xl">
+        <Card className="relative overflow-hidden w-full h-auto min-h-100 border-none rounded-xl">
           {/* The background image */}
           <img
             src="images/placeholder.jpg"
@@ -72,7 +72,7 @@ export default function Resources() {
             <p className="text-lg text-gray-200 mt-1">
               Fencing is a sport that combines physical agility, strategy, and
               discipline. From your first lunge to club competition, En Garde is
-              your technical parter in excellence.
+              your technical partner in excellence.
             </p>
           </CardContent>
         </Card>
@@ -107,7 +107,7 @@ export default function Resources() {
               </span>
             </div>
             {/* Text content */}
-            <CardContent className="p-5 space-y-2 grid grid-cols-3 gap-6">
+            <CardContent className="p-5 space-y-2 grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div>
                 <h3 className="text-lg font-bold tracking-tight">Advance</h3>
                 <p className="text-muted-foreground text-sm text-justify leading-relaxed">
@@ -197,7 +197,7 @@ export default function Resources() {
       </div>
       {/* Community */}
       <div id="community-section">
-        <Card className="relative overflow-hidden w-full h-100 border-none rounded-xl mt-6">
+        <Card className="relative overflow-hidden w-full h-auto min-h-100 border-none rounded-xl mt-6">
           {/* The background image */}
           <img
             src="images/weaponImages/Sabre.jpg"
