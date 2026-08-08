@@ -23,7 +23,9 @@ export default function NavBar() {
   // it's only the "has the user seen this badge yet" bit below that needs
   // Zustand, because there's no server concept of "seen".
   const { profile } = useProfile();
-  const getUnseenBadges = useGamificationStore((state) => state.getUnseenBadges);
+  const getUnseenBadges = useGamificationStore(
+    (state) => state.getUnseenBadges,
+  );
   const unseenBadgeCount = currentUser
     ? getUnseenBadges(profile?.badges ?? []).length
     : 0;
@@ -172,22 +174,26 @@ export default function NavBar() {
                   Resources
                 </NavLink>
 
-                <NavLink
-                  to={`/profile/${currentUser?.id}`}
-                  id="mobile-nav-profile"
-                  onClick={closeMobileNav}
-                  className={({ isActive }) =>
-                    (isActive
-                      ? "font-semibold text-foreground"
-                      : "text-muted-foreground hover:text-foreground") +
-                    " relative"
-                  }
-                >
-                  Profile
-                  {unseenBadgeCount > 0 && (
-                    <span className="absolute -right-3 top-0 size-2 rounded-full bg-primary" />
-                  )}
-                </NavLink>
+                {currentUser ? (
+                  <NavLink
+                    to={`/profile/${currentUser?.id}`}
+                    id="mobile-nav-profile"
+                    onClick={closeMobileNav}
+                    className={({ isActive }) =>
+                      (isActive
+                        ? "font-semibold text-foreground"
+                        : "text-muted-foreground hover:text-foreground") +
+                      " relative"
+                    }
+                  >
+                    Profile
+                    {unseenBadgeCount > 0 && (
+                      <span className="absolute -right-3 top-0 size-2 rounded-full bg-primary" />
+                    )}
+                  </NavLink>
+                ) : (
+                  ""
+                )}
 
                 {currentUser ? (
                   <Button

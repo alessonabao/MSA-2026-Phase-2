@@ -47,7 +47,12 @@ import {
   BookHeart,
 } from "lucide-react";
 import { useNavigate } from "react-router";
-import { formatDate, getInitials, resolveImageUrl } from "@/lib/utils";
+import {
+  formatDate,
+  formatTimeRange,
+  getInitials,
+  resolveImageUrl,
+} from "@/lib/utils";
 import { useAccount } from "@/lib/hooks/useAccount";
 import {
   useActivities,
@@ -94,78 +99,92 @@ export default function ActivityCard({ activity }: Props) {
     <>
       <Card className="relative mx-auto w-full max-w mb-10 pt-5">
         <CardHeader>
-          <CardAction>
-            <Badge id="card-activity-weapon" variant="secondary">
-              {activity.weapon}
-            </Badge>
-            <Badge id="card-activity-skillLevel" variant="secondary">
-              {activity.skillLevel}
-            </Badge>
-            <Badge id="card-activity-type" variant="secondary">
-              {activity.type}
-            </Badge>
-            {status && <Badge variant={status.variant}>{status.label}</Badge>}
-            {/* Delete event menu */}
-            {isHost && (
-              <AlertDialog>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="ml-auto">
-                      <EllipsisVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
+          <CardAction className="mb-2 gap-y-2 sm:mb-0">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Badge id="card-activity-weapon" variant="secondary">
+                {activity.weapon}
+              </Badge>
+              <Badge id="card-activity-skillLevel" variant="secondary">
+                {activity.skillLevel}
+              </Badge>
+              <Badge id="card-activity-type" variant="secondary">
+                {activity.type}
+              </Badge>
+            </div>
+            {(status || isHost) && (
+              <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
+                {status && (
+                  <Badge variant={status.variant}>{status.label}</Badge>
+                )}
+                {/* Delete event menu */}
+                {isHost && (
+                  <AlertDialog>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="sm:ml-auto"
+                        >
+                          <EllipsisVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
 
-                  <DropdownMenuContent align="end">
-                    <AlertDialogTrigger asChild>
-                      <DropdownMenuItem
-                        onSelect={(e) => e.preventDefault()}
-                        className="text-destructive"
-                      >
-                        <TrashIcon />
-                        Delete
-                      </DropdownMenuItem>
-                    </AlertDialogTrigger>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                      <DropdownMenuContent align="end">
+                        <AlertDialogTrigger asChild>
+                          <DropdownMenuItem
+                            onSelect={(e) => e.preventDefault()}
+                            className="text-destructive"
+                          >
+                            <TrashIcon />
+                            Delete
+                          </DropdownMenuItem>
+                        </AlertDialogTrigger>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
 
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete this event?</AlertDialogTitle>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Delete this event?
+                        </AlertDialogTitle>
 
-                    <AlertDialogDescription>
-                      This will permanently remove{" "}
-                      <strong>{activity.title}</strong>. This action cannot be
-                      undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
+                        <AlertDialogDescription>
+                          This will permanently remove{" "}
+                          <strong>{activity.title}</strong>. This action
+                          cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
 
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
 
-                    <AlertDialogAction
-                      variant="destructive"
-                      disabled={deleteActivity.isPending}
-                      onClick={() => {
-                        deleteActivity.mutate(activity.id, {
-                          onSuccess: () => {
-                            toast.success("Event deleted", {
-                              description: `"${activity.title}" has been deleted successfully.`,
+                        <AlertDialogAction
+                          variant="destructive"
+                          disabled={deleteActivity.isPending}
+                          onClick={() => {
+                            deleteActivity.mutate(activity.id, {
+                              onSuccess: () => {
+                                toast.success("Event deleted", {
+                                  description: `"${activity.title}" has been deleted successfully.`,
+                                });
+                              },
+                              onError: () => {
+                                toast.error("Failed to delete event", {
+                                  description: "Please try again.",
+                                });
+                              },
                             });
-                          },
-                          onError: () => {
-                            toast.error("Failed to delete event", {
-                              description: "Please try again.",
-                            });
-                          },
-                        });
-                      }}
-                    >
-                      <TrashIcon />
-                      Delete Event
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                          }}
+                        >
+                          <TrashIcon />
+                          Delete Event
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </div>
             )}
           </CardAction>
           <CardTitle id="card-activity-title">{activity.title}</CardTitle>
@@ -204,12 +223,9 @@ export default function ActivityCard({ activity }: Props) {
 
             {/* Time */}
             <div className="flex items-center gap-2">
-              <Clock7 className="h-5 w-5 text-muted-foreground" />
-              <span id="card-activity-startTime" className="text-sm">
-                {activity.startTime} -
-              </span>
-              <span id="card-activity-endTime" className="text-sm">
-                {activity.endTime}
+              <Clock7 className="h-5 w-5 shrink-0 text-muted-foreground" />
+              <span id="card-activity-time" className="text-sm">
+                {formatTimeRange(activity.startTime, activity.endTime)}
               </span>
             </div>
 

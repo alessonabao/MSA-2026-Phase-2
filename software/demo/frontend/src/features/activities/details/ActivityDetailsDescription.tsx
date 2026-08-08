@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useActivities, useActivityAttendees } from "@/lib/hooks/useActivities";
 import { useParams } from "react-router";
 import { CalendarDays, MapPin, Clock7, Users } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatTimeRange } from "@/lib/utils";
 import AttendeeList from "../AttendeeList";
 
 function ActivityDetailsDescription() {
@@ -21,27 +21,24 @@ function ActivityDetailsDescription() {
 
   return (
     <>
-      <div className="grid grid-cols-2 pl-8 pr-8 gap-4">
+      <div className="grid grid-cols-1 gap-4 pl-8 pr-8 sm:grid-cols-2">
         {/* Date */}
         <div className="flex items-center gap-2">
-          <CalendarDays className="h-5 w-5 text-muted-foreground" />
+          <CalendarDays className="h-5 w-5 shrink-0 text-muted-foreground" />
           <span id="card-activity-date" className="text-sm">
             {formatDate(activity.date)}
           </span>
         </div>
         {/* Time */}
         <div className="flex items-center gap-2">
-          <Clock7 className="h-5 w-5 text-muted-foreground" />
-          <span id="card-activity-startTime" className="text-sm">
-            {activity.startTime} -
-          </span>
-          <span id="card-activity-endTime" className="text-sm">
-            {activity.endTime}
+          <Clock7 className="h-5 w-5 shrink-0 text-muted-foreground" />
+          <span id="card-activity-time" className="text-sm">
+            {formatTimeRange(activity.startTime, activity.endTime)}
           </span>
         </div>
         {/* Venue */}
         <div className="flex items-center gap-2">
-          <MapPin className="h-5 w-5 text-muted-foreground" />
+          <MapPin className="h-5 w-5 shrink-0 text-muted-foreground" />
           <span id="card-activity-venue" className="text-sm">
             {activity.venue}
           </span>

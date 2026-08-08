@@ -10,6 +10,14 @@ export function formatDate(date: DateArg<Date>) {
   return format(date, "dd MMM yyyy");
 }
 
+// startTime/endTime come from the API as "HH:mm:ss" strings; drop the
+// seconds and join into a single string so it wraps like normal text
+// instead of breaking mid-range across separate elements.
+export function formatTimeRange(startTime: string, endTime: string) {
+  const trim = (time: string) => time.slice(0, 5);
+  return `${trim(startTime)} - ${trim(endTime)}`;
+}
+
 // The API is served from VITE_API_URL (e.g. http://localhost:5000/api), but static files
 // (uploaded profile pictures) are served from the same origin without the /api suffix.
 const API_ORIGIN = import.meta.env.VITE_API_URL.replace(/\/api\/?$/, "");
