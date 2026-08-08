@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -130,15 +130,51 @@ function isValidDate(date: Date | undefined) {
   return !isNaN(date.getTime());
 }
 
+function getDefaultValues(activity?: Activity): z.output<typeof formSchema> {
+  return {
+    title: activity?.title ?? "",
+    date: activity?.date ? new Date(activity.date) : new Date(),
+    startTime: activity?.startTime ?? "",
+    endTime: activity?.endTime ?? "",
+    description: activity?.description ?? "",
+    weapon: activity?.weapon ?? "Mixed",
+    skillLevel: activity?.skillLevel ?? "Beginner",
+    type: activity?.type ?? "Training",
+    city: activity?.city ?? "",
+    venue: activity?.venue ?? "",
+    price: activity?.price ?? 0,
+  };
+}
+
 export function ActivityForm() {
+  const { id } = useParams();
+  const { activity, isLoadingActivity } = useActivities(id);
+
+  if (isLoadingActivity) {
+    return "Loading activity...";
+  }
+
+  // Keying on the activity forces a fresh mount (and a fresh useForm call) once the
+  // real activity data has loaded, so defaultValues are computed from the actual
+  // record instead of racing a form.reset() effect on a stale, hardcoded default.
+  return <ActivityFormCard key={id ?? "create"} id={id} activity={activity} />;
+}
+
+function ActivityFormCard({
+  id,
+  activity,
+}: {
+  id?: string;
+  activity?: Activity;
+}) {
   const [dateOpen, setDateOpen] = useState(false);
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(
+    activity?.date ? new Date(activity.date) : new Date(),
+  );
   const [dateMonth, setDateMonth] = useState<Date | undefined>(date);
   const [dateValue, setDateValue] = useState(formatDate(date));
 
-  const { id } = useParams();
-  const { updateActivity, createActivity, activity, isLoadingActivity } =
-    useActivities(id);
+  const { updateActivity, createActivity } = useActivities(id);
   const navigate = useNavigate();
 
   const form = useForm<
@@ -147,52 +183,8 @@ export function ActivityForm() {
     z.output<typeof formSchema>
   >({
     resolver: zodResolver(formSchema) as Resolver<z.output<typeof formSchema>>,
-    defaultValues: {
-      title: "",
-      date: new Date(),
-      startTime: "",
-      endTime: "",
-      description: "",
-      weapon: "Mixed",
-      skillLevel: "Beginner",
-      type: "Training",
-      city: "",
-      venue: "",
-      price: 0,
-    },
+    defaultValues: getDefaultValues(activity),
   });
-
-  useEffect(() => {
-    form.reset({
-      title: activity?.title ?? "",
-      date: activity?.date ? new Date(activity.date) : new Date(),
-      startTime: activity?.startTime ?? "",
-      endTime: activity?.endTime ?? "",
-      description: activity?.description ?? "",
-      weapon: activity?.weapon ?? "Mixed",
-      skillLevel: activity?.skillLevel ?? "Beginner",
-      type: activity?.type ?? "Training",
-      city: activity?.city ?? "",
-      venue: activity?.venue ?? "",
-      price: activity?.price ?? 0,
-    });
-  }, [activity, form]);
-
-  // useEffect(() => {
-  //   form.reset({
-  //     title: activity?.title ?? "",
-  //     date: activity?.date ? new Date(activity.date) : new Date(),
-  //     startTime: activity?.startTime ?? "",
-  //     endTime: activity?.endTime ?? "",
-  //     description: activity?.description ?? "",
-  //     weapon: activity?.weapon ?? "Mixed",
-  //     skillLevel: activity?.skillLevel ?? "Beginner",
-  //     type: activity?.type ?? "Training",
-  //     city: activity?.city ?? "",
-  //     venue: activity?.venue ?? "",
-  //     price: activity?.price ?? 0,
-  //   });
-  // }, [activity, form]);
 
   async function onSubmit(data: z.output<typeof formSchema>) {
     const activityData: Activity = {
@@ -223,10 +215,6 @@ export function ActivityForm() {
         },
       });
     }
-  }
-
-  if (isLoadingActivity) {
-    return "Loading activity...";
   }
 
   return (
@@ -484,7 +472,7 @@ export function ActivityForm() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectLabel>Skill Level</SelectLabel>
+                        <SelectLabel>Club Activity Type</SelectLabel>
                         {typeItems.map((typeActivity) => (
                           <SelectItem
                             key={typeActivity.value}
