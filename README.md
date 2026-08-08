@@ -3,7 +3,6 @@
 EnGarde is a web platform designed for a student and beginner-friendly fencing club in Auckland. The club currently relies on Instagram and Instagram Messages to manage events, training sessions, and announcements, which creates several problems:
 * Beginners struggle to keep up with club activities and find basic sport knowledge (scoring, rules) hard to access
 * Members miss events due to buried messages
-* Club executives find it difficult to track attendance
 
 EnGarde addresses these pain points by providing a dedicated platform for event discovery, club communications, and member engagement.
 
@@ -13,6 +12,47 @@ For more information, visit the wiki of this repo: https://github.com/alessonaba
 
 - App: https://engarde-webapp-d3htcphje5eqh3d8.newzealandnorth-01.azurewebsites.net/
 - API Docs: https://engarde-webapp-d3htcphje5eqh3d8.newzealandnorth-01.azurewebsites.net/scalar/
+
+## Running Locally
+
+### Prerequisites
+
+Download and install these before you start:
+
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [Node.js](https://nodejs.org/) (v20+) and npm
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (used to run the SQL Server database via `docker-compose.yml`)
+- Git
+
+### 1. Start the database
+
+The database runs in a SQL Server container defined by [`docker-compose.yml`](docker-compose.yml) at the repo root:
+
+```bash
+docker compose up -d
+```
+
+This starts SQL Server on `localhost:1433`. The default connection string in [`software/demo/backend/appsettings.json`](software/demo/backend/appsettings.json) already matches these container credentials, so no extra configuration is needed.
+
+### 2. Run the backend
+
+```bash
+cd software/demo/backend
+dotnet restore
+dotnet run
+```
+
+The API starts at `http://localhost:5000`. On startup it automatically applies EF Core migrations and seeds the database (including the test accounts below), so no manual `dotnet ef database update` step is required. API docs are available at `http://localhost:5000/scalar`.
+
+### 3. Run the frontend
+
+```bash
+cd software/demo/frontend
+npm install
+npm run dev
+```
+
+The app starts at `http://localhost:5173` and is configured (via `.env.development`) to call the backend at `http://localhost:5000/api`.
 
 ## Test Credentials
 
@@ -75,17 +115,22 @@ This year's theme is **Gamification**. EnGarde applies this directly to the club
 
 ## What Makes EnGarde Unique
 
-- **Real attendance data, not mock RSVPs**: joining/cancelling an event immediately updates attendee lists, attendance history, and badge eligibility end-to-end (frontend hooks → API → EF Core → SQLite).
-- **Role-based club administration**: `ClubAdmin` and `Member` roles are enforced in the backend (`[Authorize(Roles = ...)]`), so only club executives can create, edit, or delete events, while any authenticated member can browse events, RSVP, and view other members' public profiles.
-- **Badge-driven engagement designed for beginners**: badges are intentionally centred on participation, rewarding members for attending events, joining activities, and trying new experiences rather than for skill or competition outcomes. This aligns with the club’s goal of encouraging newcomers and fostering an inclusive environment where progress is not determined by fencing ability.
+- **One platform instead of three separate tools**: most club software solves this problem in pieces: a booking app for events, a wiki for rules, a leaderboard app for engagement. EnGarde replaces the Instagram-posts-and-DMs workflow described above with a single flow: a beginner reads the Resources page (weapon breakdowns, footwork videos, equipment guide), RSVPs to their first event from the same app, and sees that event turn into a badge on their profile. No switching between a chat app, a calendar, and a separate wiki.
+- **Participation-first gamification, not skill-first**: the original design (see `specs/browser-sessions/`) considered the "obvious" gamification for a competitive sport including XP for winning bouts, tournament leaderboards, and skill-based rankings. That was deliberately removed because ranking members by wins would intimidate exactly the beginners EnGarde is built for. Badges instead reward showing up (`AttendanceBadges.cs`) to your first club event, then your fifth so a brand-new member and a club veteran are both visibly making progress from day one, not just the members who are already good at fencing.
+- **Attendance data is real, not a placeholder**: RSVPing to or cancelling an event immediately updates attendee lists, attendance history, and badge eligibility end-to-end. There's no mock data standing in for what is meant to be the app's core loop.
+- **Admin actions are actually protected, not just hidden in the UI**: `ClubAdmin` and `Member` roles are enforced server-side (`[Authorize(Roles = ...)]`), so event management is a real permission boundary rather than a button that happens to be hidden from members.
 
 ## Tech Stack
 
-**Backend**: C# / .NET 10, ASP.NET Core Web API, EF Core + SQLite, ASP.NET Core Identity, AutoMapper, MediatR, Scalar API documentation, xUnit.
+| Layer | Technologies |
+| --- | --- |
+| **Backend** | C# / .NET 10 &middot; ASP.NET Core Web API &middot; EF Core + SQL Server &middot; ASP.NET Core Identity &middot; AutoMapper &middot; MediatR &middot; Scalar API docs &middot; xUnit |
+| **Frontend** | React 19 + TypeScript &middot; Vite &middot; React Router &middot; TanStack Query &middot; Zustand &middot; Tailwind CSS + shadcn/ui &middot; React Hook Form + Zod &middot; Vitest + Testing Library &middot; Playwright |
+| **CI** | GitHub Actions &middot; unit tests (frontend + backend) + e2e tests on every push (`.github/workflows/`) |
+| **CD** | GitHub Actions &middot; Azure App Service on every push to `main`, gated on Backend CI + Frontend CI passing (`.github/workflows/cd.yml`) |
+| **Local Dev** | Docker Desktop + Docker Compose &middot; runs SQL Server locally (`docker-compose.yml`), matching production |
 
-**Frontend**: React 19 + TypeScript, Vite, React Router, TanStack Query, Zustand, Tailwind CSS + shadcn/ui, React Hook Form + Zod, Vitest + Testing Library, Playwright.
-
-**CI**: GitHub Actions running unit tests (frontend + backend) and end-to-end tests on every push (`.github/workflows/`).
+> The CD pipeline builds the frontend straight into the backend's `wwwroot`, then publishes both as a single Azure Web App.
 
 ## Project Structure
 
@@ -148,12 +193,28 @@ Per the assessment brief, only the top 3 advanced features listed here will be m
   Used for client-side state that doesn't belong in server cache: activity filters (`useActivityFilterStore`), mobile nav UI state (`useUIStore`), and cross-page "unseen badge" tracking (`useGamificationStore`, persisted to `localStorage`).
 - [x] **Theme switching (light/dark mode)**
   Implemented with `next-themes` and a `ThemeProvider`/mode-toggle component, switchable from the nav bar and persisted across sessions.
-- [x] **End-to-end testing — Playwright**
-  A Playwright suite (`frontend/tests/`) runs against the real backend with seeded auth, covering login/registration, browsing and RSVPing to activities, admin activity management, and profile editing. We used Playwright instead of Cypress for native TypeScript support and built-in parallelisation; coverage is equivalent end-to-end testing against the real API rather than mocks.
+- [x] **End-to-end testing with Playwright**
+  A Playwright suite (`frontend/tests/`) runs against the real backend with seeded auth, covering login/registration, browsing and RSVPing to activities, admin activity management, and profile editing. Used with permission from Frank in place of the brief's suggested Cypress. Playwright was chosen because it's built TypeScript-first (no separate type-definition setup), runs tests across browser engines in parallel by default rather than as an add-on, and its auto-waiting model reduces the flaky, manually-timed waits that Cypress tests are prone to.
+
+### Also implemented (not submitted for marking)
+
+- **Security Measures — RBAC and password hashing**
+  - *RBAC*: `Member` and `ClubAdmin` roles (`Roles.cs`) are enforced with `[Authorize(Roles = ...)]` on activity endpoints (`ActivitiesController.cs`), so only club executives can create, edit, or delete events, while members are limited to browsing and RSVPing. This matters because the API is the only thing standing between a member account and destructive admin actions — without server-side role checks, hiding an "Edit" button in the UI is not real access control.
+  - *Password hashing*: user passwords are never stored or compared in plaintext — ASP.NET Core Identity's `UserManager<User>` hashes them (PBKDF2 with a per-user salt) before persisting, via `AddIdentityApiEndpoints<User>()` in `Program.cs`. This matters because the database (or a backup of it) is a realistic leak vector, and hashed, salted passwords keep a leak from directly exposing user credentials.
 
 ## Self-Reflection
 
 If I were to do this project again, I would focus on setting up the frontend and backend testing structure earlier in the development process. Many of the tests were written after the main features had already been implemented, which meant some bugs were discovered later than they could have been. Adding tests earlier would have helped identify issues sooner, made refactoring safer, and improved the overall quality and maintainability of the project.
+
+## Future Work
+
+The following ideas came up during planning and development but were left out as too out of scope for the assessment timeline and requirements:
+
+- **Digital membership card**: a scannable card issued on joining, for quick entry at the training venue.
+- **Event discussion threads**: a comment section under each event for members to ask quick questions.
+- **Beginner rules quiz**: a short test on core rules and terminology after working through the Resources section.
+- **New event email notifications**: notify members by email when a new event is posted.
+- **Event reminder emails**: remind members by email a day before an event they've RSVP'd to.
 
 ## AI Usage
 
