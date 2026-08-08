@@ -14,8 +14,8 @@ local session to a JSONL transcript on the developer's machine
 
 ## How this folder was built
 
-- Every `.jsonl` session transcript for this project (30 files, spanning
-  2026-07-27 through 2026-08-01) was parsed programmatically.
+- Every `.jsonl` session transcript for this project (35 files, spanning
+  2026-07-27 through 2026-08-02) was parsed programmatically.
 - Only lines representing text a human actually typed into Claude Code were kept.
   Anything synthetic — IDE "file opened"/"selection" notices, slash-command
   echoes, background task-completion notifications, auto-generated
@@ -33,7 +33,7 @@ local session to a JSONL transcript on the developer's machine
 
 | File | What it is |
 |---|---|
-| `sessions/2026-07-27.md` … `sessions/2026-08-01.md` | Verbatim, timestamped prompts, grouped by day |
+| `sessions/2026-07-27.md` … `sessions/2026-08-02.md` | Verbatim, timestamped prompts, grouped by day |
 | `browser-sessions/` | Earlier planning prompts from the claude.ai browser Project (not locally logged — see below) |
 | `ai-usage-summary.md` | Narrative summary of how AI was used across the project, with concrete cited examples |
 | `agent-instructions.md` | What agent/tooling configuration did (and didn't) exist for this repo |
@@ -49,8 +49,9 @@ local session to a JSONL transcript on the developer's machine
 | [2026-07-30](sessions/2026-07-30.md) | User profile page + Zustand client state, event attendance (join/cancel) with milestone badges, real attendee/attendance data | 19 |
 | [2026-07-31](sessions/2026-07-31.md) | Profile edit/picture fixes, Vitest unit tests, Playwright e2e setup against real backend, CI test integration | 24 |
 | [2026-08-01](sessions/2026-08-01.md) | CI workflow refactor (unit-test/e2e-test split) + PR merge, project README/docs | 7 |
+| [2026-08-02](sessions/2026-08-02.md) | Azure CD pipeline (frontend + backend deploy), CI test fixes, README merge, video-script prep | 46 |
 
-**Total: 108 genuine prompts across 6 days of local Claude Code sessions.**
+**Total: 154 genuine prompts across 7 days of local Claude Code sessions.**
 
 ## About the browser-based planning (not in these logs)
 

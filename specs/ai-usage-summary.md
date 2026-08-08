@@ -128,6 +128,22 @@ Testing was treated as its own deliberate workstream, not an afterthought:
   frontend has E2E tests with playwright. Can you update my CI pipelines?"_ — which
   matches the 2026-08-01 commit `124e71d` ("refactor: split reusable workflow into
   unit-test and e2e-test steps").
+- CD (deployment to Azure) was built on **2026-08-02**, in two phases visible in the
+  logs. Early morning (`2f6b54b7`, 00:05–02:51) was a manual first deploy —
+  _"what do I do to publish and deploy my app to azure then?"_ — debugged live
+  against the deployed app (Azure device-code login, missing env vars, 500 errors on
+  creating/joining events, a broken profile image) before committing, matching
+  commits `5d87cbd`/`9759a0b` ("fix: resolve Azure deployment issues for backend,
+  static files, and SQL Server"). That evening (`271fa6e7`, 20:16) the actual GitHub
+  Actions CD automation was requested from scratch — _"can you help me create a cd
+  pipeline?"_ — then iterated through a failed first run ("My cd pipeline failed.
+  Here's the errors:", 21:16), fixed by rotating the `AZURE_WEBAPP_PUBLISH_PROFILE`
+  GitHub secret; a stale-cache favicon/CSS 404 chased across two sessions
+  (`613eb48e`, 21:02–22:03); and a real merge conflict in `frontend/index.html`
+  merging `feature/12-cd-pipeline` into `main` (`613eb48e`, 22:07) — matching commits
+  `7afd53e` ("chore: add Azure deployment pipeline for frontend and backend"),
+  `d0c1247`/`f9bad14` (favicon/stylesheet path fixes), and `c587ab5` ("fix: set
+  VITE_API_URL at build time in CD workflow").
 - Documentation: the README was iteratively refined against the assessment brief
   itself on 2026-08-01 (`ad49abfc`) — asked to reflect the real folder structure,
   explain nested folders in plain terms, and add a screenshots section covering
