@@ -64,6 +64,7 @@ export type Attendee = {
 export type AttendedActivity = {
   activity: Activity;
   isCancelled: boolean;
+  cancelledByOrganiser: boolean;
   joinedAt: string;
   cancelledAt: string | null;
 };

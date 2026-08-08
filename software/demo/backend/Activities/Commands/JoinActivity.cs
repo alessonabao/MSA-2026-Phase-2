@@ -43,6 +43,7 @@ public class JoinActivity
                                         // rather than inserting a second one (ActivityId, UserId is unique).
                                         attendance.IsCancelled = false;
                                         attendance.CancelledAt = null;
+                                        attendance.CancelledByOrganiser = false;
                               }
 
                               await context.SaveChangesAsync(cancellationToken);

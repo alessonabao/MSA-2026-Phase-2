@@ -44,8 +44,10 @@ public static class AttendanceBadges
 
           public static async Task AwardCancellationBadgesIfEligible(AppDbContext context, string userId)
           {
+                    // Organiser-driven cancellations don't count here - these badges are for a
+                    // member's own choice to back out, not events cancelled out from under them.
                     var cancelledCount = await context.ActivityAttendances
-                              .CountAsync(a => a.UserId == userId && a.IsCancelled);
+                              .CountAsync(a => a.UserId == userId && a.IsCancelled && !a.CancelledByOrganiser);
 
                     await AwardTiers(context, userId, cancelledCount, CancelledTiers);
           }

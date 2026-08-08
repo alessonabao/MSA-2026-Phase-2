@@ -134,6 +134,29 @@ export const useActivities = (id?: string) => {
     },
   });
 
+  // cancel event (ClubAdmin only) - distinct from cancelAttendance below, which is a member
+  // withdrawing their own RSVP. Cancelling the event also cancels every going attendee's
+  // RSVP server-side, so the same broad invalidation as join/cancelAttendance applies.
+  const cancelActivity = useMutation({
+    mutationFn: async (activityId: string) => {
+      await agent.post(`/activities/${activityId}/cancel`);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["activities"] });
+    },
+  });
+
+  // resume a previously cancelled event (ClubAdmin only). Does not restore attendees'
+  // RSVPs - see the backend ResumeActivity handler.
+  const resumeActivity = useMutation({
+    mutationFn: async (activityId: string) => {
+      await agent.post(`/activities/${activityId}/resume`);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["activities"] });
+    },
+  });
+
   // the current member's own RSVP status for this activity - server state (persisted in the
   // ActivityAttendance table), so it lives here alongside the rest of the activity data rather
   // than as local component state.
@@ -191,6 +214,8 @@ export const useActivities = (id?: string) => {
     createActivity,
     updateActivity,
     deleteActivity,
+    cancelActivity,
+    resumeActivity,
     attendance,
     isLoadingAttendance,
     joinActivity,

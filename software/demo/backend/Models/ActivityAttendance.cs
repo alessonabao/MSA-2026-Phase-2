@@ -14,4 +14,10 @@ public class ActivityAttendance
           public bool IsCancelled { get; set; }
           public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
           public DateTime? CancelledAt { get; set; }
+
+          // True when IsCancelled was set by a ClubAdmin cancelling the whole event, rather
+          // than the member withdrawing their own RSVP. Keeps organiser-driven cancellations
+          // out of the member's cancellation badge count and out of their control - it's
+          // something that happened to them, not a choice they made.
+          public bool CancelledByOrganiser { get; set; }
 }

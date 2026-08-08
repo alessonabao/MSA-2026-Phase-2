@@ -2,6 +2,17 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useAccount } from "@/lib/hooks/useAccount";
 import { useActivities } from "@/lib/hooks/useActivities";
 import { Link, useParams } from "react-router";
@@ -21,6 +32,8 @@ export default function ActivityDetailsHeader() {
     attendance,
     joinActivity,
     cancelAttendance,
+    cancelActivity,
+    resumeActivity,
   } = useActivities(id);
   const isHost = currentUser?.role === "ClubAdmin";
   const isCancelled = activity?.isCancelled ?? false;
@@ -46,6 +59,36 @@ export default function ActivityDetailsHeader() {
             ? "Couldn't cancel your attendance. Please try again."
             : "Couldn't join the event. Please try again.",
         );
+      },
+    });
+  };
+
+  const handleCancelEvent = () => {
+    if (!id) return;
+
+    cancelActivity.mutate(id, {
+      onSuccess: () => {
+        toast.success("Event cancelled", {
+          description: `"${activity.title}" has been cancelled.`,
+        });
+      },
+      onError: () => {
+        toast.error("Couldn't cancel the event. Please try again.");
+      },
+    });
+  };
+
+  const handleResumeEvent = () => {
+    if (!id) return;
+
+    resumeActivity.mutate(id, {
+      onSuccess: () => {
+        toast.success("Event resumed", {
+          description: `"${activity.title}" is open again.`,
+        });
+      },
+      onError: () => {
+        toast.error("Couldn't resume the event. Please try again.");
       },
     });
   };
@@ -83,9 +126,48 @@ export default function ActivityDetailsHeader() {
           <div className="flex flex-wrap gap-3">
             {isHost ? (
               <>
-                <Button variant={isCancelled ? "success" : "destructive"}>
-                  {isCancelled ? "Resume Event" : "Cancel Event"}
-                </Button>
+                {isCancelled ? (
+                  <Button
+                    variant="success"
+                    disabled={resumeActivity.isPending}
+                    onClick={handleResumeEvent}
+                  >
+                    Resume Event
+                  </Button>
+                ) : (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive">Cancel Event</Button>
+                    </AlertDialogTrigger>
+
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Cancel this event?</AlertDialogTitle>
+
+                        <AlertDialogDescription>
+                          Every member currently going to{" "}
+                          <strong>{activity.title}</strong> will have their RSVP
+                          cancelled and notified in their event timeline. Even
+                          if you resume the event afterwards, those RSVPs can't
+                          be restored. Attendees would need to rejoin
+                          themselves.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Keep Event</AlertDialogCancel>
+
+                        <AlertDialogAction
+                          variant="destructive"
+                          disabled={cancelActivity.isPending}
+                          onClick={handleCancelEvent}
+                        >
+                          Cancel Event
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
 
                 <Button asChild disabled={isCancelled}>
                   <Link to={`/manage/${activity.id}`}>Manage Event</Link>

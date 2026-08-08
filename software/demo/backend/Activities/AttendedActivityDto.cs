@@ -7,6 +7,7 @@ public class AttendedActivityDto
 {
           public required ClubActivity Activity { get; set; }
           public bool IsCancelled { get; set; }
+          public bool CancelledByOrganiser { get; set; }
           public DateTime JoinedAt { get; set; }
           public DateTime? CancelledAt { get; set; }
 }

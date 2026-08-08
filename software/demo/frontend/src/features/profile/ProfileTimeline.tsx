@@ -40,23 +40,32 @@ export default function ProfileTimeline({ userId }: Props) {
 
   return (
     <div className="flex flex-col gap-3">
-      {attendedActivities.map(({ activity, isCancelled }) => (
-        <Link
-          key={activity.id}
-          to={`/activities/${activity.id}`}
-          className="flex items-center justify-between gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50"
-        >
-          <div>
-            <p className="font-semibold">{activity.title}</p>
-            <p className="text-sm text-muted-foreground">
-              {formatDate(activity.date)}
-            </p>
-          </div>
-          <Badge variant={isCancelled ? "destructive" : "success"}>
-            {isCancelled ? "Cancelled" : "Attending"}
-          </Badge>
-        </Link>
-      ))}
+      {attendedActivities.map(({ activity, isCancelled, cancelledByOrganiser }) => {
+        // Cancelled by the club admin outranks a self-cancellation in how it reads here -
+        // it's something that happened to the member, not a choice they made, so it gets
+        // its own label rather than being lumped in with "Cancelled".
+        const status = !isCancelled
+          ? { label: "Attending", variant: "success" as const }
+          : cancelledByOrganiser
+            ? { label: "Cancelled by Organiser", variant: "destructive" as const }
+            : { label: "Cancelled", variant: "destructive" as const };
+
+        return (
+          <Link
+            key={activity.id}
+            to={`/activities/${activity.id}`}
+            className="flex items-center justify-between gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50"
+          >
+            <div>
+              <p className="font-semibold">{activity.title}</p>
+              <p className="text-sm text-muted-foreground">
+                {formatDate(activity.date)}
+              </p>
+            </div>
+            <Badge variant={status.variant}>{status.label}</Badge>
+          </Link>
+        );
+      })}
     </div>
   );
 }

@@ -87,4 +87,22 @@ public class ActivitiesController() : BaseApiController
 
                     return Ok();
           }
+
+          [Authorize(Roles = Roles.ClubAdmin)]
+          [HttpPost("{id}/cancel")]
+          public async Task<ActionResult> CancelEvent(string id)
+          {
+                    await Mediator.Send(new CancelActivity.Command{Id = id});
+
+                    return NoContent();
+          }
+
+          [Authorize(Roles = Roles.ClubAdmin)]
+          [HttpPost("{id}/resume")]
+          public async Task<ActionResult> ResumeEvent(string id)
+          {
+                    await Mediator.Send(new ResumeActivity.Command{Id = id});
+
+                    return NoContent();
+          }
 }

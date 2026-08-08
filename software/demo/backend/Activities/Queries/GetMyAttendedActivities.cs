@@ -22,6 +22,7 @@ public class GetMyAttendedActivities
                                         {
                                                   Activity = activity,
                                                   IsCancelled = a.IsCancelled,
+                                                  CancelledByOrganiser = a.CancelledByOrganiser,
                                                   JoinedAt = a.JoinedAt,
                                                   CancelledAt = a.CancelledAt
                                         })

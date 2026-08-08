@@ -51,6 +51,7 @@ function makeAttendance(overrides: Partial<AttendedActivity> = {}): AttendedActi
   return {
     activity,
     isCancelled: false,
+    cancelledByOrganiser: false,
     joinedAt: "2026-07-01T00:00:00.000Z",
     cancelledAt: null,
     ...overrides,
