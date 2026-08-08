@@ -17,8 +17,8 @@ public class ClubActivity
           public bool IsCancelled { get; set; }
           public required string City { get; set; }
           public required string Venue { get; set; }
-          public double Latitude { get; set; }
-          public double Longitude { get; set; }
+          public double? Latitude { get; set; }
+          public double? Longitude { get; set; }
 
           public required double Price { get; set; }
 }

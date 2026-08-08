@@ -16,14 +16,21 @@ export default function ActivityDetailsSidebar() {
     return null;
   }
 
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${activity.latitude},${activity.longitude}`;
-  const mapEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${
-    activity.longitude - MAP_BOUNDS_DELTA
-  }%2C${activity.latitude - MAP_BOUNDS_DELTA}%2C${
-    activity.longitude + MAP_BOUNDS_DELTA
-  }%2C${
-    activity.latitude + MAP_BOUNDS_DELTA
-  }&layer=mapnik&marker=${activity.latitude}%2C${activity.longitude}`;
+  const hasCoordinates =
+    activity.latitude != null && activity.longitude != null;
+
+  const mapsUrl = hasCoordinates
+    ? `https://www.google.com/maps/search/?api=1&query=${activity.latitude},${activity.longitude}`
+    : undefined;
+  const mapEmbedUrl = hasCoordinates
+    ? `https://www.openstreetmap.org/export/embed.html?bbox=${
+        activity.longitude! - MAP_BOUNDS_DELTA
+      }%2C${activity.latitude! - MAP_BOUNDS_DELTA}%2C${
+        activity.longitude! + MAP_BOUNDS_DELTA
+      }%2C${
+        activity.latitude! + MAP_BOUNDS_DELTA
+      }&layer=mapnik&marker=${activity.latitude}%2C${activity.longitude}`
+    : undefined;
 
   return (
     <div className="flex flex-col gap-4">
@@ -43,25 +50,31 @@ export default function ActivityDetailsSidebar() {
 
       {/* Venue */}
       <Card className="gap-0 py-0">
-        <a
-          href={mapsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`View ${activity.venue} on Google Maps`}
-          className="group relative block aspect-video overflow-hidden bg-slate-400"
-        >
-          <iframe
-            title={`Map of ${activity.venue}`}
-            src={mapEmbedUrl}
-            loading="lazy"
-            className="pointer-events-none h-full w-full grayscale-25"
-          />
-          <div className="pointer-events-none absolute inset-0 flex items-end justify-center pb-3 opacity-0 transition-opacity group-hover:opacity-100">
-            <span className="rounded-full bg-black/70 px-3 py-1 text-xs font-bold tracking-widest text-white uppercase">
-              View on Google Maps
-            </span>
+        {hasCoordinates ? (
+          <a
+            href={mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`View ${activity.venue} on Google Maps`}
+            className="group relative block aspect-video overflow-hidden bg-slate-400"
+          >
+            <iframe
+              title={`Map of ${activity.venue}`}
+              src={mapEmbedUrl}
+              loading="lazy"
+              className="pointer-events-none h-full w-full grayscale-25"
+            />
+            <div className="pointer-events-none absolute inset-0 flex items-end justify-center pb-3 opacity-0 transition-opacity group-hover:opacity-100">
+              <span className="rounded-full bg-black/70 px-3 py-1 text-xs font-bold tracking-widest text-white uppercase">
+                View on Google Maps
+              </span>
+            </div>
+          </a>
+        ) : (
+          <div className="flex aspect-video items-center justify-center bg-muted text-center text-xs text-muted-foreground uppercase">
+            Map unavailable for this venue
           </div>
-        </a>
+        )}
 
         <CardContent className="flex flex-col gap-1 py-(--card-spacing)">
           <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">

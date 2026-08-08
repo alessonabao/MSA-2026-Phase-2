@@ -16,8 +16,8 @@ export interface Activity {
   isCancelled: boolean;
   city: string;
   venue: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   price: number;
 }
 

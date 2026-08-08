@@ -45,7 +45,9 @@ import {
 } from "@/components/ui/select";
 import type { Activity } from "@/lib/types";
 import { useActivities } from "@/lib/hooks/useActivities";
+import { geocodeAddress } from "@/lib/api/geocoding";
 import { useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 
 const formSchema = z
   .object({
@@ -176,6 +178,7 @@ function ActivityFormCard({
 
   const { updateActivity, createActivity } = useActivities(id);
   const navigate = useNavigate();
+  const [isGeocoding, setIsGeocoding] = useState(false);
 
   const form = useForm<
     z.output<typeof formSchema>,
@@ -187,6 +190,29 @@ function ActivityFormCard({
   });
 
   async function onSubmit(data: z.output<typeof formSchema>) {
+    let latitude = activity?.latitude ?? null;
+    let longitude = activity?.longitude ?? null;
+
+    setIsGeocoding(true);
+    try {
+      const geocoded = await geocodeAddress(`${data.venue}, ${data.city}`);
+      if (geocoded) {
+        latitude = geocoded.latitude;
+        longitude = geocoded.longitude;
+      } else {
+        toast.error(
+          "Couldn't find that venue on the map. You can edit the event later to fix its location.",
+        );
+      }
+    } catch (error) {
+      console.error("Geocoding failed:", error);
+      toast.error(
+        "Couldn't look up the venue location. You can edit the event later to fix its location.",
+      );
+    } finally {
+      setIsGeocoding(false);
+    }
+
     const activityData: Activity = {
       id: activity?.id ?? crypto.randomUUID(),
       title: data.title,
@@ -200,8 +226,8 @@ function ActivityFormCard({
       isCancelled: activity?.isCancelled ?? false,
       city: data.city,
       venue: data.venue,
-      latitude: activity?.latitude ?? 0,
-      longitude: activity?.longitude ?? 0,
+      latitude,
+      longitude,
       price: data.price,
     };
 
@@ -571,9 +597,11 @@ function ActivityFormCard({
           type="submit"
           form="form-activity"
           className="w-full sm:w-auto"
-          disabled={updateActivity.isPending || createActivity.isPending}
+          disabled={
+            isGeocoding || updateActivity.isPending || createActivity.isPending
+          }
         >
-          Submit
+          {isGeocoding ? "Locating venue..." : "Submit"}
         </Button>
       </CardFooter>
     </Card>
