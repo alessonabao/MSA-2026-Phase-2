@@ -77,14 +77,18 @@ export default function ActivityCard({ activity }: Props) {
     (a) => a.activity.id === activity.id,
   );
   const isGoing = !!myAttendance && !myAttendance.isCancelled;
-  const isCancelled = !!myAttendance?.isCancelled;
+  // Only a self-cancellation should keep showing "Cancelled" once the event itself
+  // isn't cancelled anymore - an organiser cancelling+resuming the event doesn't
+  // restore attendance, but it also wasn't the member's own choice, so surfacing a
+  // stale "Cancelled" badge here would read as "the event is still cancelled."
+  const isSelfCancelled = !!myAttendance?.isCancelled && !myAttendance.cancelledByOrganiser;
 
   // Priority: the event itself being cancelled by an admin outranks the
   // current user's own attendance relationship, which in turn outranks
   // "you are hosting" (a ClubAdmin has no ActivityAttendance row of their own).
   const status = activity.isCancelled
     ? { label: "Event Cancelled", variant: "destructive" as const }
-    : isCancelled
+    : isSelfCancelled
       ? { label: "Cancelled", variant: "destructive" as const }
       : isHost
         ? { label: "You are hosting", variant: "default" as const }

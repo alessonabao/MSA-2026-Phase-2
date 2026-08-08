@@ -123,7 +123,7 @@ export default function ActivityDetailsHeader() {
             <p className="mt-1 text-sm text-gray-200">Hosted by Fencing Club</p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-nowrap shrink-0 gap-3">
             {isHost ? (
               <>
                 {isCancelled ? (

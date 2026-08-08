@@ -113,6 +113,20 @@ describe("ActivityCard status badge", () => {
     expect(screen.queryByText("Attending")).not.toBeInTheDocument();
   });
 
+  it("shows no status badge once a resumed event's organiser-cancelled attendance is stale", () => {
+    setup({
+      currentUser: makeUser({ role: "Member" }),
+      myAttendedActivities: [
+        makeAttendance({ isCancelled: true, cancelledByOrganiser: true }),
+      ],
+      activityOverrides: { isCancelled: false },
+    });
+
+    expect(screen.queryByText("Cancelled")).not.toBeInTheDocument();
+    expect(screen.queryByText("Event Cancelled")).not.toBeInTheDocument();
+    expect(screen.queryByText("Attending")).not.toBeInTheDocument();
+  });
+
   it("shows 'You are hosting' for a ClubAdmin with no attendance row", () => {
     setup({ currentUser: makeUser({ role: "ClubAdmin" }) });
 
