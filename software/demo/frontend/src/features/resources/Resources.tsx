@@ -67,7 +67,7 @@ export default function Resources() {
           {/* Dark overlay to ensure text readability */}
           <div className="absolute inset-0 bg-black/40" />
           {/* Text Content Container */}
-          <CardContent className="relative z-10 h-full flex flex-col justify-end p-6 text-white">
+          <CardContent className="relative z-10 mt-auto p-6 text-white">
             <h3 className="page-title">Welcome to the art of Fencing</h3>
             <p className="text-lg text-gray-200 mt-1">
               Fencing is a sport that combines physical agility, strategy, and
@@ -207,7 +207,7 @@ export default function Resources() {
           {/* Dark overlay to ensure text readability */}
           <div className="absolute inset-0 bg-black/40" />
           {/* Text Content Container */}
-          <CardContent className="relative z-10 h-full flex flex-col justify-end p-6 text-white">
+          <CardContent className="relative z-10 mt-auto p-6 text-white">
             <h3 className="page-title">Becoming Part of the Fencing Club</h3>
             <p className="text-lg text-gray-200 text-justify mt-1">
               Joining a fencing club is about more than learning how to fence.
