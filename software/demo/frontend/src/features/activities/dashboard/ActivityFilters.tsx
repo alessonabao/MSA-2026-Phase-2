@@ -1,6 +1,7 @@
 import { isWithinInterval, parseISO, startOfDay, endOfDay } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import type { Activity, ActivityType, SkillLevel, Weapon } from "@/lib/types";
+import { EVENT_TYPE_OPTIONS } from "@/lib/constants/activityOptions";
 
 export type ParticipationFilter = "all" | "going" | "notGoing";
 
@@ -11,18 +12,6 @@ export interface ActivityFilters {
   skillLevel: SkillLevel | null;
   dateRange: DateRange | undefined;
 }
-
-export const WEAPON_OPTIONS: Weapon[] = ["Foil", "Épée", "Sabre", "Mixed"];
-export const EVENT_TYPE_OPTIONS: ActivityType[] = [
-  "Competition",
-  "Training",
-  "Social",
-];
-export const SKILL_LEVEL_OPTIONS: SkillLevel[] = [
-  "Beginner",
-  "Intermediate",
-  "Advanced",
-];
 
 export const DEFAULT_ACTIVITY_FILTERS: ActivityFilters = {
   participation: "all",

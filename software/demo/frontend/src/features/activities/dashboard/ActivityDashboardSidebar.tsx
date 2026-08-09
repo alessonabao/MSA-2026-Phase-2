@@ -8,13 +8,12 @@ import { Button } from "@/components/ui/button";
 import { useAccount } from "@/lib/hooks/useAccount";
 import { useActivityFilterStore } from "@/lib/stores/useActivityFilterStore";
 import type { Activity, Weapon, SkillLevel } from "@/lib/types";
+import { getInitialCalendarMonth, type ParticipationFilter } from "./ActivityFilters";
 import {
   EVENT_TYPE_OPTIONS,
-  getInitialCalendarMonth,
   SKILL_LEVEL_OPTIONS,
   WEAPON_OPTIONS,
-  type ParticipationFilter,
-} from "./ActivityFilters";
+} from "@/lib/constants/activityOptions";
 
 const PARTICIPATION_OPTIONS: { value: ParticipationFilter; label: string }[] = [
   { value: "all", label: "All Events" },
