@@ -155,6 +155,44 @@ describe("ActivityForm", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/activities/new-activity-id");
   });
 
+  it("uses the known-venue override coordinates without calling the geocoder", async () => {
+    const user = userEvent.setup();
+    const createActivity = {
+      isPending: false,
+      mutate: vi.fn((_data, opts?: { onSuccess?: (id: string) => void }) =>
+        opts?.onSuccess?.("new-activity-id"),
+      ),
+    };
+    mockUseActivities.mockReturnValue(makeActivitiesHooks({ createActivity }));
+    // Other tests in this file also resolve mockGeocodeAddress; clear its call
+    // history (implementation stays via beforeEach) so the assertion below only
+    // reflects this test's own submission.
+    mockGeocodeAddress.mockClear();
+    renderForm();
+
+    await user.type(screen.getByLabelText("Club Activity Title"), "Advanced Sabre Meetup");
+    await user.type(
+      screen.getByLabelText("Description"),
+      "Join us for a competitive sabre session.",
+    );
+    fireEvent.change(screen.getByLabelText("Start Time"), { target: { value: "18:00" } });
+    fireEvent.change(screen.getByLabelText("End Time"), { target: { value: "20:00" } });
+    await user.type(screen.getByLabelText("City"), "Auckland");
+    await user.type(
+      screen.getByLabelText("Venue"),
+      "Hiwa Recreation Centre, 17 Symonds Street, Auckland CBD",
+    );
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+
+    await waitFor(() => expect(createActivity.mutate).toHaveBeenCalled());
+    const [submitted] = createActivity.mutate.mock.calls[0];
+    expect(submitted).toMatchObject({
+      latitude: -36.852634,
+      longitude: 174.769104,
+    });
+    expect(mockGeocodeAddress).not.toHaveBeenCalled();
+  });
+
   it("shows a toast but still submits when the venue can't be geocoded", async () => {
     mockGeocodeAddress.mockResolvedValue(null);
     const user = userEvent.setup();

@@ -10,6 +10,29 @@ export interface GeocodeResult {
 export async function geocodeAddress(
   query: string,
 ): Promise<GeocodeResult | null> {
+  const result = await fetchGeocodeResult(query);
+  if (result) {
+    return result;
+  }
+
+  // Nominatim has no fuzzy business/POI-name search - it only matches strings
+  // against places it has actually mapped. A venue name it doesn't recognise
+  // (e.g. "Hiwa Recreation Centre, 17 Symonds Street, Auckland CBD") can make the
+  // whole query match nothing, even though the street address portion alone
+  // would resolve fine. Retry once without the leading ", "-separated segment.
+  // Requiring at least two commas left after stripping guards against dropping
+  // the only address info when the venue field was never more than a plain
+  // "street, city" pair to begin with.
+  const firstCommaIndex = query.indexOf(",");
+  const addressOnly = query.slice(firstCommaIndex + 1).trim();
+  if (firstCommaIndex === -1 || addressOnly.split(",").length < 2) {
+    return null;
+  }
+
+  return fetchGeocodeResult(addressOnly);
+}
+
+async function fetchGeocodeResult(query: string): Promise<GeocodeResult | null> {
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("format", "json");
   url.searchParams.set("limit", "1");

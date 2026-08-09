@@ -32,6 +32,7 @@ import {
   SKILL_LEVEL_OPTIONS,
   WEAPON_OPTIONS,
 } from "@/lib/constants/activityOptions";
+import { getKnownVenueCoordinates } from "@/lib/constants/knownVenues";
 import { FormTextField } from "./fields/FormTextField";
 import { FormSelectField } from "./fields/FormSelectField";
 import { ActivityDateField } from "./fields/ActivityDateField";
@@ -86,24 +87,30 @@ function ActivityFormCard({
     let latitude = activity?.latitude ?? null;
     let longitude = activity?.longitude ?? null;
 
-    setIsGeocoding(true);
-    try {
-      const geocoded = await geocodeAddress(`${data.venue}, ${data.city}`);
-      if (geocoded) {
-        latitude = geocoded.latitude;
-        longitude = geocoded.longitude;
-      } else {
+    const knownCoordinates = getKnownVenueCoordinates(data.venue);
+    if (knownCoordinates) {
+      latitude = knownCoordinates.latitude;
+      longitude = knownCoordinates.longitude;
+    } else {
+      setIsGeocoding(true);
+      try {
+        const geocoded = await geocodeAddress(`${data.venue}, ${data.city}`);
+        if (geocoded) {
+          latitude = geocoded.latitude;
+          longitude = geocoded.longitude;
+        } else {
+          toast.error(
+            "Couldn't find that venue on the map. You can edit the event later to fix its location.",
+          );
+        }
+      } catch (error) {
+        console.error("Geocoding failed:", error);
         toast.error(
-          "Couldn't find that venue on the map. You can edit the event later to fix its location.",
+          "Couldn't look up the venue location. You can edit the event later to fix its location.",
         );
+      } finally {
+        setIsGeocoding(false);
       }
-    } catch (error) {
-      console.error("Geocoding failed:", error);
-      toast.error(
-        "Couldn't look up the venue location. You can edit the event later to fix its location.",
-      );
-    } finally {
-      setIsGeocoding(false);
     }
 
     const activityData: Activity = {
