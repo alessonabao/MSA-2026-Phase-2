@@ -1,8 +1,9 @@
 # EnGarde
 
 EnGarde is a web platform designed for a student and beginner-friendly fencing club in Auckland. The club currently relies on Instagram and Instagram Messages to manage events, training sessions, and announcements, which creates several problems:
-* Beginners struggle to keep up with club activities and find basic sport knowledge (scoring, rules) hard to access
-* Members miss events due to buried messages
+
+- Beginners struggle to keep up with club activities and find basic sport knowledge (scoring, rules) hard to access
+- Members miss events due to buried messages
 
 EnGarde addresses these pain points by providing a dedicated platform for event discovery, club communications, and member engagement.
 
@@ -46,6 +47,8 @@ The API starts at `http://localhost:5000`. On startup it automatically applies E
 
 ### 3. Run the frontend
 
+Before starting the frontend, add the `.env.development` file to `software/demo/frontend/`. This was provided separately in the submission form. If you can't find it, feel free to reach me at ajnabao@gmail.com
+
 ```bash
 cd software/demo/frontend
 npm install
@@ -58,58 +61,69 @@ The app starts at `http://localhost:5173` and is configured (via `.env.developme
 
 These accounts are seeded automatically on backend startup (`DbSeedData.cs`) so markers can log in without registering:
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Member | `alesson@test.com` | `EnGarde!2` |
+| Role       | Email                  | Password    |
+| ---------- | ---------------------- | ----------- |
+| Member     | `alesson@test.com`     | `EnGarde!2` |
 | Club Admin | `fencingclub@test.com` | `EnGarde!2` |
 
 The Member account can browse events, RSVP, and earn badges. The Club Admin account can additionally create, edit, and delete events.
 
 ## Screenshots
+
 ### Home / Landing Page
+
 <img width="2560" height="4154" alt="image" src="https://github.com/user-attachments/assets/0d12fde3-6051-49ca-b3a4-1718ad850558" />
 
 ### Activities Dashboard (browse + filters)
+
 <img width="2560" height="2586" alt="image" src="https://github.com/user-attachments/assets/8a0d5b0b-85cd-4af5-a1c3-912dda6c2652" />
 
 ### Activity Details
+
 <img width="2560" height="2274" alt="image" src="https://github.com/user-attachments/assets/ceb8341c-f6ab-4503-8f92-47fbd9553b3c" />
 
 ### Login
+
 <img width="2560" height="1964" alt="image" src="https://github.com/user-attachments/assets/b7f15c10-7a37-4385-b5e2-d2bc891660f5" />
 
 ### Register
+
 <img width="2560" height="2146" alt="image" src="https://github.com/user-attachments/assets/2ae61d53-8b18-4560-9c90-8afb5155c0d4" />
 
 ### Member Profile (badges + event history)
+
 <img width="2560" height="2564" alt="image" src="https://github.com/user-attachments/assets/3733769d-c3d9-4806-9bd2-0270d4fe4058" />
 
 ### Member Update Profile
+
 <img width="2560" height="2564" alt="image" src="https://github.com/user-attachments/assets/f5485f72-9ca4-46d1-ace9-9f086b4e03a0" />
 
 ### Admin: Dashboard
+
 <img width="2560" height="2567" alt="image" src="https://github.com/user-attachments/assets/f8bfc92d-6735-4330-9b5f-ad2a4cb33f55" />
 
 ### Admin: Create
+
 <img width="2560" height="3186" alt="image" src="https://github.com/user-attachments/assets/afcb0d3e-4473-4aa5-8327-b2f0cf4e6bff" />
 
 ### Admin: Delete
+
 <img width="2556" height="1082" alt="image" src="https://github.com/user-attachments/assets/ec98c650-f9d4-4567-9c22-42645604d2a9" />
 
 ### Mobile Navigation Menu (open state)
+
 <img width="340" height="640" alt="image" src="https://github.com/user-attachments/assets/9ef7b357-6b9e-425c-89ee-3990a5851344" /> <img width="340" height="640" alt="image" src="https://github.com/user-attachments/assets/b997b14a-32d9-481f-aaeb-4669b9fda5d8" />
 
 ### Light vs. Dark Mode
+
 <img width="2560" height="2488" alt="image" src="https://github.com/user-attachments/assets/4456785b-2a71-4611-a95a-03ef9761465e" />
 <img width="2560" height="2485" alt="image" src="https://github.com/user-attachments/assets/5dd1db07-1d1f-405d-875a-e70d003a68e1" />
-
-
 
 ## How EnGarde Relates to the Theme (Gamification)
 
 This year's theme is **Gamification**. EnGarde applies this directly to the club-attendance problem above:
 
-- **Milestone badges**: joining or cancelling club events awards tiered badges (e.g. *First Touch* for a first event joined, *Regular Fencer* at 5 events, *Club Veteran* at 10) via `AttendanceBadges.cs`, giving beginners a visible sense of progress instead of a silent RSVP.
+- **Milestone badges**: joining or cancelling club events awards tiered badges (e.g. _First Touch_ for a first event joined, _Regular Fencer_ at 5 events, _Club Veteran_ at 10) via `AttendanceBadges.cs`, giving beginners a visible sense of progress instead of a silent RSVP.
 - **Progress tracking**: a member's profile shows their event history and earned badges, turning attendance into a track record rather than a message buried in a chat thread.
 - **"New badge" feedback loop**: a dedicated Zustand store (`useGamificationStore`) tracks which earned badges a member has not viewed yet, displaying an indicator in the navigation bar until they open their profile. This helps complete the gamification feedback loop by connecting user actions, rewards, and notifications across the app.
 
@@ -122,13 +136,13 @@ This year's theme is **Gamification**. EnGarde applies this directly to the club
 
 ## Tech Stack
 
-| Layer | Technologies |
-| --- | --- |
-| **Backend** | C# / .NET 10 &middot; ASP.NET Core Web API &middot; EF Core + SQL Server &middot; ASP.NET Core Identity &middot; AutoMapper &middot; MediatR &middot; Scalar API docs &middot; xUnit |
-| **Frontend** | React 19 + TypeScript &middot; Vite &middot; React Router &middot; TanStack Query &middot; Zustand &middot; Tailwind CSS + shadcn/ui &middot; React Hook Form + Zod &middot; Vitest + Testing Library &middot; Playwright |
-| **CI** | GitHub Actions &middot; unit tests (frontend + backend) + e2e tests on every push (`.github/workflows/`) |
-| **CD** | GitHub Actions &middot; Azure App Service on every push to `main`, gated on Backend CI + Frontend CI passing (`.github/workflows/cd.yml`) |
-| **Local Dev** | Docker Desktop + Docker Compose &middot; runs SQL Server locally (`docker-compose.yml`), matching production |
+| Layer         | Technologies                                                                                                                                                                                                              |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Backend**   | C# / .NET 10 &middot; ASP.NET Core Web API &middot; EF Core + SQL Server &middot; ASP.NET Core Identity &middot; AutoMapper &middot; MediatR &middot; Scalar API docs &middot; xUnit                                      |
+| **Frontend**  | React 19 + TypeScript &middot; Vite &middot; React Router &middot; TanStack Query &middot; Zustand &middot; Tailwind CSS + shadcn/ui &middot; React Hook Form + Zod &middot; Vitest + Testing Library &middot; Playwright |
+| **CI**        | GitHub Actions &middot; unit tests (frontend + backend) + e2e tests on every push (`.github/workflows/`)                                                                                                                  |
+| **CD**        | GitHub Actions &middot; Azure App Service on every push to `main`, gated on Backend CI + Frontend CI passing (`.github/workflows/cd.yml`)                                                                                 |
+| **Local Dev** | Docker Desktop + Docker Compose &middot; runs SQL Server locally (`docker-compose.yml`), matching production                                                                                                              |
 
 > The CD pipeline builds the frontend straight into the backend's `wwwroot`, then publishes both as a single Azure Web App.
 
@@ -141,7 +155,7 @@ software/demo/
 │   │   ├── Commands/       # Write actions (create, edit, delete, join, cancel an event)
 │   │   └── Queries/        # Read actions (list events, event details, attendees, attendance history)
 │   ├── backend.Tests/      # xUnit test project, mirrors the folders below so each feature has matching tests
-│   │   └── Testing/        # Shared test helpers 
+│   │   └── Testing/        # Shared test helpers
 │   ├── Controllers/        # API endpoints exposed to the frontend (auth, events, profiles)
 │   ├── Core/                # Shared object-mapping configuration (DB entities <-> API responses)
 │   ├── Data/                 # Database connection setup and initial seed data
@@ -190,17 +204,17 @@ software/demo/
 Per the assessment brief, only the top 3 advanced features listed here will be marked.
 
 - [x] **State management library — Zustand**
-  Used for client-side state that doesn't belong in server cache: activity filters (`useActivityFilterStore`), mobile nav UI state (`useUIStore`), and cross-page "unseen badge" tracking (`useGamificationStore`, persisted to `localStorage`).
+      Used for client-side state that doesn't belong in server cache: activity filters (`useActivityFilterStore`), mobile nav UI state (`useUIStore`), and cross-page "unseen badge" tracking (`useGamificationStore`, persisted to `localStorage`).
 - [x] **Theme switching (light/dark mode)**
-  Implemented with `next-themes` and a `ThemeProvider`/mode-toggle component, switchable from the nav bar and persisted across sessions.
+      Implemented with `next-themes` and a `ThemeProvider`/mode-toggle component, switchable from the nav bar and persisted across sessions.
 - [x] **End-to-end testing with Playwright**
-  A Playwright suite (`frontend/tests/`) runs against the real backend with seeded auth, covering login/registration, browsing and RSVPing to activities, admin activity management, and profile editing. Used with permission from Frank in place of the brief's suggested Cypress. Playwright was chosen because it's built TypeScript-first (no separate type-definition setup), runs tests across browser engines in parallel by default rather than as an add-on, and its auto-waiting model reduces the flaky, manually-timed waits that Cypress tests are prone to.
+      A Playwright suite (`frontend/tests/`) runs against the real backend with seeded auth, covering login/registration, browsing and RSVPing to activities, admin activity management, and profile editing. Used with permission from Frank in place of the brief's suggested Cypress. Playwright was chosen because it's built TypeScript-first (no separate type-definition setup), runs tests across browser engines in parallel by default rather than as an add-on, and its auto-waiting model reduces the flaky, manually-timed waits that Cypress tests are prone to.
 
 ### Also implemented (not submitted for marking)
 
 - **Security Measures — RBAC and password hashing**
-  - *RBAC*: `Member` and `ClubAdmin` roles (`Roles.cs`) are enforced with `[Authorize(Roles = ...)]` on activity endpoints (`ActivitiesController.cs`), so only club executives can create, edit, or delete events, while members are limited to browsing and RSVPing. This matters because the API is the only thing standing between a member account and destructive admin actions — without server-side role checks, hiding an "Edit" button in the UI is not real access control.
-  - *Password hashing*: user passwords are never stored or compared in plaintext — ASP.NET Core Identity's `UserManager<User>` hashes them (PBKDF2 with a per-user salt) before persisting, via `AddIdentityApiEndpoints<User>()` in `Program.cs`. This matters because the database (or a backup of it) is a realistic leak vector, and hashed, salted passwords keep a leak from directly exposing user credentials.
+  - _RBAC_: `Member` and `ClubAdmin` roles (`Roles.cs`) are enforced with `[Authorize(Roles = ...)]` on activity endpoints (`ActivitiesController.cs`), so only club executives can create, edit, or delete events, while members are limited to browsing and RSVPing. This matters because the API is the only thing standing between a member account and destructive admin actions — without server-side role checks, hiding an "Edit" button in the UI is not real access control.
+  - _Password hashing_: user passwords are never stored or compared in plaintext — ASP.NET Core Identity's `UserManager<User>` hashes them (PBKDF2 with a per-user salt) before persisting, via `AddIdentityApiEndpoints<User>()` in `Program.cs`. This matters because the database (or a backup of it) is a realistic leak vector, and hashed, salted passwords keep a leak from directly exposing user credentials.
 
 ## Self-Reflection
 
